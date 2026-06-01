@@ -132,12 +132,13 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
                             )
                         }
 
-                        // Circular Flag
+                        // Circular Flag Badge (Bottom Right)
                         Surface(
-                            modifier = Modifier.size(34.dp).offset(x = 2.dp, y = 2.dp),
+                            modifier = Modifier.size(36.dp).offset(x = 4.dp, y = 4.dp),
                             shape = CircleShape,
                             color = Color.White,
-                            border = BorderStroke(2.dp, Color.White)
+                            border = BorderStroke(2.dp, Color.White),
+                            shadowElevation = 2.dp
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Text(
@@ -291,61 +292,60 @@ fun MomentCard(author: String, avatarUrl: String?, time: String, content: String
     Surface(
         modifier = Modifier.fillMaxWidth(),
         color = FunkySurface,
-        shape = RoundedCornerShape(36.dp),
-        border = BorderStroke(1.dp, FunkyBorderLight)
+        shape = RoundedCornerShape(32.dp)
     ) {
-        Column(Modifier.padding(24.dp)) {
+        Column(Modifier.padding(20.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     AsyncImage(
                         model = avatarUrl ?: "https://images.unsplash.com/photo-1625241152315-4a698f74ceb7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400",
                         contentDescription = null,
-                        modifier = Modifier.size(48.dp).clip(CircleShape),
+                        modifier = Modifier.size(44.dp).clip(CircleShape),
                         contentScale = ContentScale.Crop
                     )
                     Column {
-                        Text(author, style = AppTextStyle.titleMedium.copy(color = FunkyTextPrimary, fontWeight = FontWeight.SemiBold, fontSize = 17.sp))
-                        Text(time, style = AppTextStyle.caption.copy(color = FunkyTextSecondary, fontSize = 12.sp))
+                        Text(author, style = AppTextStyle.titleMedium.copy(color = FunkyTextPrimary, fontWeight = FontWeight.SemiBold, fontSize = 16.sp))
+                        Text(time, style = AppTextStyle.caption.copy(color = FunkyTextSecondary, fontSize = 11.sp))
                     }
                 }
-                Icon(Icons.Default.MoreVert, contentDescription = null, tint = FunkyTextTertiary)
+                Icon(Icons.Default.MoreVert, contentDescription = null, tint = FunkyTextTertiary, modifier = Modifier.size(20.dp))
             }
 
-            Spacer(Modifier.height(18.dp))
-            Text(content, style = AppTextStyle.bodyMedium.copy(color = FunkyTextPrimary, lineHeight = 22.sp, fontSize = 15.sp))
-            Spacer(Modifier.height(18.dp))
+            Spacer(Modifier.height(16.dp))
+            Text(content, style = AppTextStyle.bodyMedium.copy(color = FunkyTextPrimary, lineHeight = 20.sp, fontSize = 14.sp))
+            Spacer(Modifier.height(16.dp))
 
             if (images.size >= 2) {
-                Row(Modifier.fillMaxWidth().height(220.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Row(Modifier.fillMaxWidth().height(200.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     AsyncImage(
                         model = images[0],
                         contentDescription = null,
-                        modifier = Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(24.dp)),
+                        modifier = Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(16.dp)),
                         contentScale = ContentScale.Crop
                     )
                     AsyncImage(
                         model = images[1],
                         contentDescription = null,
-                        modifier = Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(24.dp)),
+                        modifier = Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(16.dp)),
                         contentScale = ContentScale.Crop
                     )
                 }
             }
 
-            Spacer(Modifier.height(24.dp))
-            HorizontalDivider(color = FunkyBorderLight, thickness = 1.2.dp)
-            Spacer(Modifier.height(14.dp))
+            Spacer(Modifier.height(20.dp))
+            HorizontalDivider(color = FunkyBorderLight.copy(alpha = 0.5f), thickness = 1.dp)
+            Spacer(Modifier.height(12.dp))
 
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Icon(Icons.Outlined.FavoriteBorder, null, Modifier.size(26.dp), tint = FunkyTextSecondary)
-                    Text("124", style = AppTextStyle.label.copy(color = FunkyTextSecondary, fontSize = 14.sp))
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Icon(Icons.Outlined.FavoriteBorder, null, Modifier.size(22.dp), tint = FunkyTextSecondary)
+                    Text("124", style = AppTextStyle.label.copy(color = FunkyTextSecondary, fontSize = 13.sp))
                 }
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Icon(Icons.Outlined.ChatBubbleOutline, null, Modifier.size(24.dp), tint = FunkyTextSecondary)
-                    Text("48", style = AppTextStyle.label.copy(color = FunkyTextSecondary, fontSize = 14.sp))
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Icon(Icons.Outlined.ChatBubbleOutline, null, Modifier.size(20.dp), tint = FunkyTextSecondary)
+                    Text("48", style = AppTextStyle.label.copy(color = FunkyTextSecondary, fontSize = 13.sp))
                 }
-                Icon(Icons.Outlined.Share, null, Modifier.size(26.dp), tint = FunkyTextSecondary)
+                Icon(Icons.Outlined.Share, null, Modifier.size(22.dp), tint = FunkyTextSecondary)
             }
         }
     }
