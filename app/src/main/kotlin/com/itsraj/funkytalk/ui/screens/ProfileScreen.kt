@@ -137,8 +137,7 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
                             modifier = Modifier.size(36.dp).offset(x = 4.dp, y = 4.dp),
                             shape = CircleShape,
                             color = Color.White,
-                            border = BorderStroke(2.dp, Color.White),
-                            shadowElevation = 2.dp
+                            border = BorderStroke(2.dp, Color.White)
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Text(
