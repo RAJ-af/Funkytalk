@@ -105,9 +105,9 @@ fun FunkyNavHost(
             HomeScreen(navController, voiceRoomViewModel, authViewModel, announcementViewModel)
         }
         composable(Screen.Moments.route) { MomentsScreen() }
-        composable(Screen.Discover.route) { DiscoverScreen() }
+        composable(Screen.Discover.route) { DiscoverScreen(navController) }
         composable(Screen.Chats.route) { ChatsScreen(navController) }
-        composable(Screen.Profile.route) { ProfileScreen() }
+        composable(Screen.Profile.route) { ProfileScreen(navController, authViewModel) }
         composable(
             route = Screen.VoiceRoom.route,
             arguments = listOf(

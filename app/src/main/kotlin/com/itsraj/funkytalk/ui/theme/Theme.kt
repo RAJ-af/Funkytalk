@@ -5,28 +5,49 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-private val LightColorScheme = lightColorScheme(
-    primary = MangoYellow,
-    onPrimary = Black,
-    background = White,
-    onBackground = Black,
-    surface = White,
-    onSurface = Black,
-    surfaceVariant = GrayLight,
-    onSurfaceVariant = Black,
-    outline = Black
+private val FunkyColorScheme = lightColorScheme(
+    primary = FunkyYellow,
+    onPrimary = FunkyTextOnYellow,
+    primaryContainer = FunkyYellowSoft,
+    onPrimaryContainer = FunkyTextOnYellow,
+
+    secondary = FunkyYellow,
+    onSecondary = FunkyTextOnYellow,
+    secondaryContainer = FunkyYellowLight,
+    onSecondaryContainer = FunkyTextPrimary,
+
+    tertiary = FunkyYellow,
+    onTertiary = FunkyTextOnYellow,
+
+    background = FunkyBackground,
+    onBackground = FunkyTextPrimary,
+
+    surface = FunkySurface,
+    onSurface = FunkyTextPrimary,
+    surfaceVariant = FunkySurfaceElevated,
+    onSurfaceVariant = FunkyTextSecondary,
+
+    outline = FunkyBorder,
+    outlineVariant = FunkyBorderLight,
+
+    error = FunkyError,
+    onError = FunkySurface,
+    errorContainer = FunkyError.copy(alpha = 0.08f),
+    onErrorContainer = FunkyError,
+
+    inverseSurface = FunkyTextPrimary,
+    inverseOnSurface = FunkyBackground,
+    surfaceTint = FunkyYellow
 )
 
 @Composable
 fun FunkyTalkTheme(
-    darkTheme: Boolean = false, // Strictly Light Mode as requested
-    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    // We use LightColorScheme for both to ensure strictly light mode for now
     MaterialTheme(
-        colorScheme = LightColorScheme,
-        typography = Typography,
+        colorScheme = FunkyColorScheme,
+        typography = FunkyTypography,
+        shapes = AppShapes.material,
         content = content
     )
 }

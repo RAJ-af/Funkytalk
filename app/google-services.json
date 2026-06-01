@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "665352364995",
+    "project_id": "funkytalk-317cf",
+    "storage_bucket": "funkytalk-317cf.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:665352364995:android:eda0018830a599e0431376",
+        "android_client_info": {
+          "package_name": "com.itsraj.funkytalk"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "665352364995-gnd69vt6nprdfncmj7j3pacrnisjshmd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCbuuJaW1mppWpX8pZCgiyK1JPJtt9ZnWc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "665352364995-gnd69vt6nprdfncmj7j3pacrnisjshmd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
