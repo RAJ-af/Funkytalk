@@ -154,8 +154,12 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
                     Text(name, style = AppTextStyle.displayMedium.copy(color = FunkyTextPrimary, fontSize = 32.sp, fontWeight = FontWeight.SemiBold))
                     Spacer(Modifier.height(8.dp))
                     Text(p.bio ?: "Travel | Photography | Good vibes only 📷",
-                        style = AppTextStyle.bodyMedium.copy(color = FunkyTextSecondary, fontWeight = FontWeight.Medium, fontSize = 16.sp),
-                        modifier = Modifier.fillMaxWidth())
+                        style = AppTextStyle.bodySmall.copy(color = FunkyTextSecondary, fontWeight = FontWeight.Medium, fontSize = 16.sp)
+                        style = AppTextStyle.bodySmall.copy(color = FunkyTextSecondary, fontWeight = FontWeight.Medium, fontSize = 16.sp)
+                        style = AppTextStyle.bodySmall.copy(color = FunkyTextSecondary, fontWeight = FontWeight.Medium, fontSize = 16.sp)
+                        style = AppTextStyle.bodySmall.copy(color = FunkyTextSecondary, fontWeight = FontWeight.Medium, fontSize = 16.sp)
+                        style = AppTextStyle.bodySmall.copy(color = FunkyTextSecondary, fontWeight = FontWeight.Medium, fontSize = 16.sp)
+                        style = AppTextStyle.bodySmall.copy(color = FunkyTextSecondary, fontWeight = FontWeight.Medium, fontSize = 16.sp)
 
                     Spacer(Modifier.height(20.dp))
 
@@ -312,7 +316,7 @@ fun MomentCard(author: String, avatarUrl: String?, time: String, content: String
             }
 
             Spacer(Modifier.height(18.dp))
-            Text(content, style = AppTextStyle.bodyMedium.copy(color = FunkyTextPrimary, lineHeight = 22.sp, fontSize = 15.sp))
+            Text(content, style = AppTextStyle.bodySmall.copy(color = FunkyTextPrimary, lineHeight = 22.sp, fontSize = 15.sp))
             Spacer(Modifier.height(18.dp))
 
             if (images.size >= 2) {
