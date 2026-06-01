@@ -1,6 +1,7 @@
 package com.itsraj.funkytalk.ui.screens
 
 import androidx.compose.animation.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -17,10 +18,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -80,7 +81,7 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
                         modifier = Modifier
                             .padding(horizontal = 4.dp, vertical = 6.dp)
                     ) {
-                        Text(atHandle, style = AppTextStyle.titleMedium.copy(color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp))
+                        Text(atHandle, style = AppTextStyle.titleMedium.copy(color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 18.sp))
                         Icon(Icons.Outlined.ContentCopy, contentDescription = "Copy",
                             tint = Color.White, modifier = Modifier.size(18.dp))
                     }
@@ -98,29 +99,15 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
             }
 
             // ═══════ AVATAR + STATS (OVERLAP) ════════════════════
-            Column(Modifier.fillMaxWidth().padding(horizontal = 24.dp)) {
+            Column(Modifier.padding(horizontal = 24.dp)) {
                 Row(
-                    modifier = Modifier.fillMaxWidth().offset(y = (-55).dp),
-                    verticalAlignment = Alignment.Bottom,
-                    horizontalArrangement = Arrangement.spacedBy(24.dp)
+                    Modifier
+                        .fillMaxWidth()
+                        .offset(y = (-60).dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Bottom
                 ) {
-                    // Avatar with thick yellow border
-                    Surface(
-                        modifier = Modifier.size(120.dp),
-                        shape = CircleShape,
-                        color = Color.White,
-                        border = androidx.compose.foundation.BorderStroke(4.dp, FunkyYellow),
-                        shadowElevation = 12.dp
-                    ) {
-                        AsyncImage(
-                            model = p.avatar_url ?: "https://images.unsplash.com/photo-1625241152315-4a698f74ceb7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400",
-                            contentDescription = name,
-                            modifier = Modifier.fillMaxSize().clip(CircleShape),
-                            contentScale = ContentScale.Crop
-                        )
-                    }
-
-                    // Stats row
+                    // Stats row (Left)
                     Row(
                         modifier = Modifier.padding(bottom = 12.dp),
                         horizontalArrangement = Arrangement.spacedBy(32.dp)
@@ -128,13 +115,47 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
                         StatItem("512", "Followers")
                         StatItem("320", "Following")
                     }
+
+                    // Avatar with Flag overlap (Right)
+                    Box(contentAlignment = Alignment.BottomEnd) {
+                        Surface(
+                            modifier = Modifier.size(120.dp),
+                            shape = CircleShape,
+                            color = Color.White,
+                            border = BorderStroke(4.dp, FunkyYellow)
+                        ) {
+                            AsyncImage(
+                                model = p.avatar_url ?: "https://images.unsplash.com/photo-1625241152315-4a698f74ceb7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400",
+                                contentDescription = name,
+                                modifier = Modifier.fillMaxSize().clip(CircleShape),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+
+                        // Circular Flag
+                        Surface(
+                            modifier = Modifier.size(34.dp).offset(x = 2.dp, y = 2.dp),
+                            shape = CircleShape,
+                            color = Color.White,
+                            border = BorderStroke(2.dp, Color.White)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Text(
+                                    text = getFlagEmoji(p.country ?: "IN"),
+                                    style = TextStyle(fontSize = 18.sp)
+                                )
+                            }
+                        }
+                    }
                 }
 
                 // Name and Bio
                 Column(Modifier.offset(y = (-40).dp)) {
-                    Text(name, style = AppTextStyle.displayMedium.copy(color = FunkyTextPrimary, fontSize = 32.sp, fontWeight = FontWeight.Bold))
+                    Text(name, style = AppTextStyle.displayMedium.copy(color = FunkyTextPrimary, fontSize = 32.sp, fontWeight = FontWeight.SemiBold))
+                    Spacer(Modifier.height(8.dp))
                     Text(p.bio ?: "Travel | Photography | Good vibes only 📷",
-                        style = AppTextStyle.bodyMedium.copy(color = FunkyTextSecondary, fontWeight = FontWeight.Medium, fontSize = 16.sp))
+                        style = AppTextStyle.bodyMedium.copy(color = FunkyTextSecondary, fontWeight = FontWeight.Medium, fontSize = 16.sp),
+                        modifier = Modifier.fillMaxWidth())
 
                     Spacer(Modifier.height(20.dp))
 
@@ -160,7 +181,7 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
                         ) {
                             Text(label, style = AppTextStyle.label.copy(
                                 color = if (sel) FunkyTextOnYellow else FunkyTextSecondary,
-                                fontWeight = if (sel) FontWeight.Bold else FontWeight.SemiBold,
+                                fontWeight = if (sel) FontWeight.SemiBold else FontWeight.Medium,
                                 fontSize = 16.sp
                             ))
                         }
@@ -170,18 +191,36 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
 
             Spacer(Modifier.height(24.dp))
 
-            // ═══════ MOMENTS FEED ═════════════════════════════════
-            Column(Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
-                MomentCard(
-                    author = name,
-                    avatarUrl = p.avatar_url,
-                    time = "2 hours ago",
-                    content = "Exploring the hidden gems of the city today. The architecture here is breathtaking! 🏛️✨",
-                    images = listOf(
-                        "https://images.unsplash.com/photo-1520310809185-5cc119cf8b08?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400",
-                        "https://images.unsplash.com/photo-1778461456551-2126d8a7fa67?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400"
-                    )
-                )
+            // ═══════ TAB CONTENT ═════════════════════════════════
+            Box(Modifier.padding(horizontal = 16.dp)) {
+                if (tab == 0) {
+                    // Moments Feed
+                    Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+                        MomentCard(
+                            author = name,
+                            avatarUrl = p.avatar_url,
+                            time = "2 hours ago",
+                            content = "Exploring the hidden gems of the city today. The architecture here is breathtaking! 🏛️✨",
+                            images = listOf(
+                                "https://images.unsplash.com/photo-1520310809185-5cc119cf8b08?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400",
+                                "https://images.unsplash.com/photo-1778461456551-2126d8a7fa67?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400"
+                            )
+                        )
+                    }
+                } else {
+                    // About Tab
+                    Column(
+                        Modifier
+                            .fillMaxWidth()
+                            .background(FunkySurface, RoundedCornerShape(24.dp))
+                            .padding(24.dp),
+                        verticalArrangement = Arrangement.spacedBy(20.dp)
+                    ) {
+                        AboutSection("Hobbies", p.hobbies?.joinToString(" • ") ?: "Photography • Music • Coding")
+                        AboutSection("Native Languages", p.native_languages?.joinToString(" • ") ?: "Hindi • English")
+                        AboutSection("Learning", p.learning_languages?.joinToString(" • ") ?: "Spanish • Japanese")
+                    }
+                }
             }
 
             Spacer(Modifier.height(120.dp))
@@ -210,9 +249,18 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
 }
 
 @Composable
+fun AboutSection(title: String, content: String) {
+    Column {
+        Text(title, style = AppTextStyle.labelSmall.copy(color = FunkyTextSecondary, fontWeight = FontWeight.SemiBold))
+        Spacer(Modifier.height(4.dp))
+        Text(content, style = AppTextStyle.body.copy(color = FunkyTextPrimary, fontSize = 15.sp))
+    }
+}
+
+@Composable
 fun StatItem(count: String, label: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(count, style = AppTextStyle.titleLarge.copy(color = FunkyTextPrimary, fontSize = 24.sp, fontWeight = FontWeight.Bold))
+        Text(count, style = AppTextStyle.titleLarge.copy(color = FunkyTextPrimary, fontSize = 24.sp, fontWeight = FontWeight.SemiBold))
         Text(label, style = AppTextStyle.labelSmall.copy(color = FunkyTextSecondary, fontSize = 14.sp))
     }
 }
@@ -230,10 +278,10 @@ fun UnifiedBadge(gender: String, age: Int) {
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             val icon = if (gender.lowercase() == "female") "♀" else "♂"
-            Text(icon, fontSize = 18.sp, color = FunkyTextOnYellow, fontWeight = FontWeight.Bold)
-            Text(gender, style = AppTextStyle.label.copy(color = FunkyTextOnYellow, fontWeight = FontWeight.Bold, fontSize = 15.sp))
+            Text(icon, fontSize = 18.sp, color = FunkyTextOnYellow, fontWeight = FontWeight.SemiBold)
+            Text(gender, style = AppTextStyle.label.copy(color = FunkyTextOnYellow, fontWeight = FontWeight.SemiBold, fontSize = 15.sp))
             Box(Modifier.size(4.dp).clip(CircleShape).background(FunkyTextOnYellow.copy(alpha = 0.4f)))
-            Text("$age Years", style = AppTextStyle.label.copy(color = FunkyTextOnYellow, fontWeight = FontWeight.Bold, fontSize = 15.sp))
+            Text("$age Years", style = AppTextStyle.label.copy(color = FunkyTextOnYellow, fontWeight = FontWeight.SemiBold, fontSize = 15.sp))
         }
     }
 }
@@ -241,9 +289,10 @@ fun UnifiedBadge(gender: String, age: Int) {
 @Composable
 fun MomentCard(author: String, avatarUrl: String?, time: String, content: String, images: List<String>) {
     Surface(
-        modifier = Modifier.fillMaxWidth().shadow(6.dp, RoundedCornerShape(36.dp)),
+        modifier = Modifier.fillMaxWidth(),
         color = FunkySurface,
-        shape = RoundedCornerShape(36.dp)
+        shape = RoundedCornerShape(36.dp),
+        border = BorderStroke(1.dp, FunkyBorderLight)
     ) {
         Column(Modifier.padding(24.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -255,7 +304,7 @@ fun MomentCard(author: String, avatarUrl: String?, time: String, content: String
                         contentScale = ContentScale.Crop
                     )
                     Column {
-                        Text(author, style = AppTextStyle.titleMedium.copy(color = FunkyTextPrimary, fontWeight = FontWeight.Bold, fontSize = 17.sp))
+                        Text(author, style = AppTextStyle.titleMedium.copy(color = FunkyTextPrimary, fontWeight = FontWeight.SemiBold, fontSize = 17.sp))
                         Text(time, style = AppTextStyle.caption.copy(color = FunkyTextSecondary, fontSize = 12.sp))
                     }
                 }
@@ -300,4 +349,11 @@ fun MomentCard(author: String, avatarUrl: String?, time: String, content: String
             }
         }
     }
+}
+
+fun getFlagEmoji(countryCode: String): String {
+    if (countryCode.length != 2) return "🇮🇳"
+    val firstLetter = Character.codePointAt(countryCode.uppercase(), 0) - 0x41 + 0x1F1E6
+    val secondLetter = Character.codePointAt(countryCode.uppercase(), 1) - 0x41 + 0x1F1E6
+    return String(Character.toChars(firstLetter)) + String(Character.toChars(secondLetter))
 }
