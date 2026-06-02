@@ -19,48 +19,27 @@ import com.itsraj.funkytalk.ui.theme.FunkyTextPrimary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WebViewScreen(
-    title: String,
-    url: String,
-    onBack: () -> Unit
-) {
+fun WebViewScreen(title: String, url: String, onBack: () -> Unit) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        title,
-                        style = AppTextStyle.titleLarge.copy(
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 17.sp
-                        )
-                    )
-                },
+                title = { Text(title, style = AppTextStyle.titleLarge.copy(fontWeight = FontWeight.SemiBold, fontSize = 17.sp)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = FunkyTextPrimary
-                        )
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = FunkyTextPrimary)
                     }
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = FunkyBackground
-                )
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = FunkyBackground)
             )
         }
     ) { padding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
+        Box(Modifier.fillMaxSize().padding(padding)) {
             AndroidView(
                 factory = { context ->
                     WebView(context).apply {
                         webViewClient = WebViewClient()
                         settings.javaScriptEnabled = true
+                        settings.domStorageEnabled = true
                         loadUrl(url)
                     }
                 },

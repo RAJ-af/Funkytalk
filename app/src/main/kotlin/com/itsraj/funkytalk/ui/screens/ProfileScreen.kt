@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -44,14 +45,24 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
             // Header Section (Banner + Avatar Overlay)
             Box(Modifier.fillMaxWidth().height(260.dp)) {
                 // Banner
-                AsyncImage(
-                    model = bannerUrl,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp),
-                    contentScale = ContentScale.Crop
-                )
+                Box(Modifier.fillMaxWidth().height(200.dp)) {
+                    AsyncImage(
+                        model = bannerUrl,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                    // Subtle gradient overlay for readability
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .background(
+                                Brush.verticalGradient(
+                                    colors = listOf(Color.Black.copy(alpha = 0.3f), Color.Transparent, Color.Black.copy(alpha = 0.3f))
+                                )
+                            )
+                    )
+                }
 
                 // Top-Left @Username (Inside Banner)
                 Text(
@@ -113,11 +124,11 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
                 }
             }
 
-            // Stats Centered Below Banner
+            // Stats Centered Below Banner (Slightly moved up)
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 12.dp),
+                    .padding(vertical = 8.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -126,13 +137,12 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
                 StatItem("842", "Following")
             }
 
-            // User Info Section
+            // User Info Section (Tightened spacing)
             Column(
                 Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp)
             ) {
-                // Display Name Below Avatar Area
                 Text(
                     userProfile?.profile_name ?: "Display Name",
                     style = AppTextStyle.headline.copy(fontSize = 22.sp, fontWeight = FontWeight.Bold)
@@ -140,19 +150,17 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
 
                 Spacer(Modifier.height(4.dp))
 
-                // Bio Below Display Name
                 Text(
                     userProfile?.bio ?: "No bio yet. Tap settings to edit your profile.",
                     style = AppTextStyle.body.copy(color = FunkyTextSecondary, lineHeight = 20.sp)
                 )
 
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(10.dp))
 
-                // Gender-Age Pill
                 UnifiedBadge(userProfile?.gender ?: "Unknown", userProfile?.age ?: 0)
             }
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(20.dp))
 
             // Segmented Tabs
             var selectedTab by remember { mutableStateOf(0) }
@@ -178,15 +186,11 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
                             "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800"
                         )
                     )
-                    Spacer(Modifier.height(80.dp)) // Bottom Nav Padding
-                }
-            } else {
-                Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
-                    AboutSection("Native Language", (userProfile?.native_languages ?: listOf("English")).joinToString(", "))
-                    AboutSection("Learning", (userProfile?.learning_languages ?: listOf("Spanish", "French")).joinToString(", "))
-                    AboutSection("Hobbies", (userProfile?.hobbies ?: listOf("Music", "Travel", "Photography")).joinToString(", "))
                     Spacer(Modifier.height(80.dp))
                 }
+            } else {
+                AboutTabContent(userProfile)
+                Spacer(Modifier.height(80.dp))
             }
         }
 
@@ -195,7 +199,8 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
             ModalBottomSheet(
                 onDismissRequest = { showSettings = false },
                 containerColor = FunkySurface,
-                dragHandle = { BottomSheetDefaults.DragHandle(color = FunkyBorder) }
+                dragHandle = { BottomSheetDefaults.DragHandle(color = FunkyBorder) },
+                shape = AppShapes.bottomSheet
             ) {
                 SettingsContent(
                     navController = navController,
@@ -213,6 +218,89 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
 }
 
 @Composable
+fun AboutTabContent(userProfile: com.itsraj.funkytalk.data.model.UserProfile?) {
+    Column(
+        Modifier
+            .padding(horizontal = 20.dp)
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        AboutSectionGroup(
+            listOf(
+                "Native Language" to (userProfile?.native_languages ?: listOf("English")).joinToString(", "),
+                "Learning" to (userProfile?.learning_languages ?: listOf("Spanish", "French")).joinToString(", ")
+            )
+        )
+
+        InterestsSection(userProfile?.hobbies ?: listOf("Music", "Travel", "Photography", "Coding", "Gaming"))
+    }
+}
+
+@Composable
+fun AboutSectionGroup(items: List<Pair<String, String>>) {
+    Surface(
+        color = FunkySurfaceElevated,
+        shape = AppShapes.card,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            items.forEachIndexed { index, pair ->
+                AboutSectionItem(pair.first, pair.second)
+                if (index < items.size - 1) {
+                    HorizontalDivider(color = FunkyBorderLight)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun AboutSectionItem(title: String, content: String) {
+    Column {
+        Text(
+            title,
+            style = AppTextStyle.labelSmall.copy(
+                color = FunkyTextSecondary,
+                fontWeight = FontWeight.Medium,
+                fontSize = 12.sp
+            )
+        )
+        Spacer(Modifier.height(2.dp))
+        Text(content, style = AppTextStyle.body.copy(color = FunkyTextPrimary, fontSize = 14.sp))
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun InterestsSection(hobbies: List<String>) {
+    Column {
+        Text(
+            "Interests",
+            style = AppTextStyle.titleMedium.copy(fontSize = 16.sp, fontWeight = FontWeight.SemiBold),
+            modifier = Modifier.padding(bottom = 12.dp)
+        )
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            hobbies.forEach { hobby ->
+                Surface(
+                    shape = RoundedCornerShape(100.dp),
+                    color = FunkySurfaceElevated,
+                    border = BorderStroke(1.dp, FunkyBorder)
+                ) {
+                    Text(
+                        hobby,
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
+                        style = AppTextStyle.labelSmall.copy(color = FunkyTextPrimary)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun SettingsContent(navController: NavController, onLogout: () -> Unit, onDismiss: () -> Unit) {
     Column(
         Modifier
@@ -223,42 +311,36 @@ fun SettingsContent(navController: NavController, onLogout: () -> Unit, onDismis
         Text(
             "Settings",
             style = AppTextStyle.headline.copy(fontSize = 18.sp, fontWeight = FontWeight.SemiBold),
-            modifier = Modifier.padding(bottom = 20.dp)
+            modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        SettingsItem(Icons.Outlined.Edit, "Edit Profile", onClick = { onDismiss(); navController.navigate(Screen.EditProfile.route) })
-        SettingsItem(Icons.Outlined.Block, "Blocked Users", onClick = { onDismiss(); navController.navigate(Screen.BlockedUsers.route) })
+        Column(
+            Modifier
+                .clip(AppShapes.card)
+                .background(FunkySurfaceElevated)
+        ) {
+            SettingsItem(Icons.Outlined.Edit, "Edit Profile", onClick = { onDismiss(); navController.navigate(Screen.EditProfile.route) })
+            HorizontalDivider(color = FunkyBorderLight, modifier = Modifier.padding(horizontal = 16.dp))
+            SettingsItem(Icons.Outlined.Block, "Blocked Users", onClick = onDismiss)
+            HorizontalDivider(color = FunkyBorderLight, modifier = Modifier.padding(horizontal = 16.dp))
+            SettingsItem(Icons.Outlined.PrivacyTip, "Privacy Policy", onClick = onDismiss)
+            HorizontalDivider(color = FunkyBorderLight, modifier = Modifier.padding(horizontal = 16.dp))
+            SettingsItem(Icons.Outlined.Info, "About FunkyTalk", onClick = onDismiss)
+            HorizontalDivider(color = FunkyBorderLight, modifier = Modifier.padding(horizontal = 16.dp))
+            SettingsItem(Icons.Outlined.Feedback, "Feedback", onClick = onDismiss)
+        }
 
-        SettingsItem(
-            Icons.Outlined.PrivacyTip,
-            "Privacy Policy",
-            onClick = {
-                onDismiss()
-                navController.navigate(Screen.WebView.createRoute("Privacy Policy", "https://lost39.github.io/funkytalk/#"))
-            }
-        )
-        SettingsItem(
-            Icons.Outlined.Description,
-            "Terms of Service",
-            onClick = {
-                onDismiss()
-                navController.navigate(Screen.WebView.createRoute("Terms of Service", "https://lost39.github.io/funkytalk/#"))
-            }
-        )
+        Spacer(Modifier.height(24.dp))
 
-        SettingsItem(Icons.Outlined.Info, "About FunkyTalk", onClick = { onDismiss(); navController.navigate(Screen.About.route) })
-        SettingsItem(Icons.Outlined.Feedback, "Feedback", onClick = { onDismiss(); navController.navigate(Screen.Feedback.route) })
-
-        Spacer(Modifier.height(8.dp))
-        HorizontalDivider(color = FunkyBorderLight)
-        Spacer(Modifier.height(8.dp))
-
-        SettingsItem(
-            Icons.AutoMirrored.Outlined.Logout,
-            "Logout",
-            color = FunkyError,
-            onClick = onLogout
-        )
+        Button(
+            onClick = onLogout,
+            modifier = Modifier.fillMaxWidth().height(50.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = FunkyError.copy(alpha = 0.1f), contentColor = FunkyError),
+            elevation = ButtonDefaults.buttonElevation(0.dp)
+        ) {
+            Text("Log Out", style = AppTextStyle.label.copy(fontWeight = FontWeight.Bold))
+        }
 
         Spacer(Modifier.height(24.dp))
     }
@@ -268,48 +350,28 @@ fun SettingsContent(navController: NavController, onLogout: () -> Unit, onDismis
 fun SettingsItem(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     label: String,
-    color: Color = FunkyTextPrimary,
     onClick: () -> Unit
 ) {
     Row(
         Modifier
             .fillMaxWidth()
-            .height(56.dp)
-            .clickable(
-                remember { MutableInteractionSource() },
-                indication = ripple(),
-                onClick = onClick
-            ),
+            .height(50.dp)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Icon(icon, null, Modifier.size(22.dp), tint = color.copy(alpha = 0.8f))
+        Icon(icon, null, Modifier.size(20.dp), tint = FunkyTextPrimary.copy(alpha = 0.7f))
         Text(
             label,
             style = AppTextStyle.label.copy(
-                color = color,
+                color = FunkyTextPrimary,
                 fontWeight = FontWeight.Medium,
-                fontSize = 15.sp
+                fontSize = 14.sp
             )
         )
         Spacer(Modifier.weight(1f))
-        Icon(Icons.Outlined.ChevronRight, null, Modifier.size(18.dp), tint = FunkyTextTertiary)
-    }
-}
-
-@Composable
-fun AboutSection(title: String, content: String) {
-    Column {
-        Text(
-            title,
-            style = AppTextStyle.labelSmall.copy(
-                color = FunkyTextSecondary,
-                fontWeight = FontWeight.Medium,
-                fontSize = 12.sp
-            )
-        )
-        Spacer(Modifier.height(4.dp))
-        Text(content, style = AppTextStyle.body.copy(color = FunkyTextPrimary, fontSize = 14.sp))
+        Icon(Icons.Outlined.ChevronRight, null, Modifier.size(16.dp), tint = FunkyTextTertiary)
     }
 }
 
@@ -326,7 +388,7 @@ fun StatItem(count: String, label: String) {
         )
         Text(
             label,
-            style = AppTextStyle.labelSmall.copy(color = FunkyTextSecondary, fontSize = 12.sp)
+            style = AppTextStyle.labelSmall.copy(color = FunkyTextSecondary, fontSize = 11.sp)
         )
     }
 }
@@ -336,21 +398,21 @@ fun UnifiedBadge(gender: String, age: Int) {
     Surface(
         color = FunkyYellowSoft,
         shape = RoundedCornerShape(10.dp),
-        modifier = Modifier.height(32.dp)
+        modifier = Modifier.height(28.dp)
     ) {
         Row(
-            Modifier.padding(horizontal = 12.dp),
+            Modifier.padding(horizontal = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             val icon = if (gender.lowercase() == "female") "♀" else "♂"
-            Text(icon, fontSize = 14.sp, color = FunkyTextOnYellow, fontWeight = FontWeight.SemiBold)
+            Text(icon, fontSize = 12.sp, color = FunkyTextOnYellow, fontWeight = FontWeight.Bold)
             Text(
                 gender,
                 style = AppTextStyle.label.copy(
                     color = FunkyTextOnYellow,
                     fontWeight = FontWeight.Medium,
-                    fontSize = 13.sp
+                    fontSize = 12.sp
                 )
             )
             Box(Modifier.size(3.dp).clip(CircleShape).background(FunkyTextOnYellow.copy(alpha = 0.4f)))
@@ -359,7 +421,7 @@ fun UnifiedBadge(gender: String, age: Int) {
                 style = AppTextStyle.label.copy(
                     color = FunkyTextOnYellow,
                     fontWeight = FontWeight.Medium,
-                    fontSize = 13.sp
+                    fontSize = 12.sp
                 )
             )
         }
@@ -376,126 +438,52 @@ fun MomentCard(
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = FunkySurface,
-        shape = RoundedCornerShape(24.dp)
+        color = FunkySurfaceElevated,
+        shape = AppShapes.card
     ) {
-        Column(Modifier.padding(16.dp)) {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    AsyncImage(
-                        model = avatarUrl ?: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400",
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(36.dp)
-                            .clip(CircleShape),
-                        contentScale = ContentScale.Crop
-                    )
-                    Column {
-                        Text(
-                            author,
-                            style = AppTextStyle.label.copy(
-                                color = FunkyTextPrimary,
-                                fontWeight = FontWeight.SemiBold,
-                                fontSize = 14.sp
-                            )
-                        )
-                        Text(
-                            time,
-                            style = AppTextStyle.caption.copy(color = FunkyTextSecondary, fontSize = 10.sp)
+        Column(Modifier.padding(14.dp)) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                AsyncImage(
+                    model = avatarUrl ?: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400",
+                    contentDescription = null,
+                    modifier = Modifier.size(32.dp).clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+                Column(Modifier.weight(1f)) {
+                    Text(author, style = AppTextStyle.label.copy(fontWeight = FontWeight.SemiBold, fontSize = 13.sp))
+                    Text(time, style = AppTextStyle.caption.copy(color = FunkyTextSecondary, fontSize = 10.sp))
+                }
+                Icon(Icons.Outlined.MoreVert, null, tint = FunkyTextTertiary, modifier = Modifier.size(18.dp))
+            }
+
+            Spacer(Modifier.height(10.dp))
+            Text(content, style = AppTextStyle.body.copy(fontSize = 13.sp, lineHeight = 18.sp))
+
+            if (images.isNotEmpty()) {
+                Spacer(Modifier.height(10.dp))
+                Row(Modifier.fillMaxWidth().height(120.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    images.forEach { img ->
+                        AsyncImage(
+                            model = img,
+                            contentDescription = null,
+                            modifier = Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(12.dp)),
+                            contentScale = ContentScale.Crop
                         )
                     }
                 }
-                Icon(
-                    Icons.Outlined.MoreVert,
-                    contentDescription = null,
-                    tint = FunkyTextTertiary,
-                    modifier = Modifier.size(18.dp)
-                )
             }
 
             Spacer(Modifier.height(12.dp))
-            Text(
-                content,
-                style = AppTextStyle.body.copy(
-                    color = FunkyTextPrimary,
-                    lineHeight = 18.sp,
-                    fontSize = 13.sp
-                )
-            )
-            Spacer(Modifier.height(12.dp))
-
-            if (images.size >= 2) {
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .height(160.dp),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    AsyncImage(
-                        model = images[0],
-                        contentDescription = null,
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight()
-                            .clip(RoundedCornerShape(12.dp)),
-                        contentScale = ContentScale.Crop
-                    )
-                    AsyncImage(
-                        model = images[1],
-                        contentDescription = null,
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight()
-                            .clip(RoundedCornerShape(12.dp)),
-                        contentScale = ContentScale.Crop
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(16.dp))
-            HorizontalDivider(color = FunkyBorderLight.copy(alpha = 0.5f), thickness = 1.dp)
-            Spacer(Modifier.height(10.dp))
-
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Icon(
-                        Icons.Outlined.FavoriteBorder,
-                        null,
-                        Modifier.size(18.dp),
-                        tint = FunkyTextSecondary
-                    )
-                    Text(
-                        "124",
-                        style = AppTextStyle.label.copy(color = FunkyTextSecondary, fontSize = 12.sp)
-                    )
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Icon(Icons.Outlined.FavoriteBorder, null, Modifier.size(16.dp), tint = FunkyTextSecondary)
+                    Text("124", style = AppTextStyle.caption.copy(color = FunkyTextSecondary))
                 }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Icon(
-                        Icons.Outlined.ChatBubbleOutline,
-                        null,
-                        Modifier.size(16.dp),
-                        tint = FunkyTextSecondary
-                    )
-                    Text(
-                        "48",
-                        style = AppTextStyle.label.copy(color = FunkyTextSecondary, fontSize = 12.sp)
-                    )
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Icon(Icons.Outlined.ChatBubbleOutline, null, Modifier.size(16.dp), tint = FunkyTextSecondary)
+                    Text("48", style = AppTextStyle.caption.copy(color = FunkyTextSecondary))
                 }
-                Icon(
-                    Icons.Outlined.Share,
-                    null,
-                    Modifier.size(18.dp),
-                    tint = FunkyTextSecondary
-                )
+                Icon(Icons.Outlined.Share, null, Modifier.size(16.dp), tint = FunkyTextSecondary)
             }
         }
     }

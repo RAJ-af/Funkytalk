@@ -1,7 +1,7 @@
 package com.itsraj.funkytalk.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,12 +32,7 @@ fun FeedbackScreen(onBack: () -> Unit) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        "Feedback",
-                        style = AppTextStyle.titleLarge.copy(fontWeight = FontWeight.SemiBold)
-                    )
-                },
+                title = { Text("Feedback", style = AppTextStyle.titleLarge.copy(fontWeight = FontWeight.SemiBold)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = FunkyTextPrimary)
@@ -49,121 +44,82 @@ fun FeedbackScreen(onBack: () -> Unit) {
         containerColor = FunkyBackground
     ) { padding ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .verticalScroll(rememberScrollState())
-                .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            modifier = Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            Text(
-                "We'd love to hear from you! Let us know how we can improve FunkyTalk.",
-                style = AppTextStyle.body.copy(color = FunkyTextSecondary)
-            )
+            Text("Let us know how we can improve.", style = AppTextStyle.body.copy(color = FunkyTextSecondary))
 
-            // Category Selection
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    "Category",
-                    style = AppTextStyle.labelSmall.copy(color = FunkyTextPrimary, fontWeight = FontWeight.SemiBold)
-                )
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text("Category", style = AppTextStyle.labelSmall.copy(color = FunkyTextSecondary))
                 Box {
-                    OutlinedCard(
+                    Surface(
                         onClick = { isMenuExpanded = true },
-                        shape = RoundedCornerShape(16.dp),
-                        colors = CardDefaults.outlinedCardColors(containerColor = FunkySurfaceElevated),
-                        border = CardDefaults.outlinedCardBorder(enabled = true).copy(width = 0.dp)
+                        shape = RoundedCornerShape(12.dp),
+                        color = FunkySurfaceElevated,
+                        modifier = Modifier.fillMaxWidth().height(48.dp),
+                        border = BorderStroke(1.dp, FunkyBorder)
                     ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(category, style = AppTextStyle.body.copy(color = FunkyTextPrimary))
+                        Row(Modifier.padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text(category, style = AppTextStyle.body.copy(fontSize = 14.sp))
                             Icon(Icons.Default.ArrowDropDown, null, tint = FunkyTextSecondary)
                         }
                     }
-                    DropdownMenu(
-                        expanded = isMenuExpanded,
-                        onDismissRequest = { isMenuExpanded = false },
-                        modifier = Modifier.background(FunkySurface)
-                    ) {
+                    DropdownMenu(expanded = isMenuExpanded, onDismissRequest = { isMenuExpanded = false }, modifier = Modifier.background(FunkySurface)) {
                         categories.forEach { cat ->
-                            DropdownMenuItem(
-                                text = { Text(cat, style = AppTextStyle.body) },
-                                onClick = {
-                                    category = cat
-                                    isMenuExpanded = false
-                                }
-                            )
+                            DropdownMenuItem(text = { Text(cat, style = AppTextStyle.body) }, onClick = { category = cat; isMenuExpanded = false })
                         }
                     }
                 }
             }
 
-            // Message field
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    "Message",
-                    style = AppTextStyle.labelSmall.copy(color = FunkyTextPrimary, fontWeight = FontWeight.SemiBold)
-                )
-                TextField(
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text("Message", style = AppTextStyle.labelSmall.copy(color = FunkyTextSecondary))
+                OutlinedTextField(
                     value = message,
                     onValueChange = { message = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(160.dp),
-                    placeholder = { Text("What's on your mind?", style = AppTextStyle.body.copy(color = FunkyTextTertiary)) },
-                    shape = RoundedCornerShape(16.dp),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = FunkySurfaceElevated,
+                    modifier = Modifier.fillMaxWidth().height(140.dp),
+                    placeholder = { Text("What's on your mind?", style = AppTextStyle.body.copy(color = FunkyTextTertiary, fontSize = 14.sp)) },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = FunkyYellow,
+                        unfocusedBorderColor = FunkyBorder,
                         unfocusedContainerColor = FunkySurfaceElevated,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        cursorColor = FunkyYellow
+                        focusedContainerColor = FunkySurfaceElevated
                     ),
-                    textStyle = AppTextStyle.body
+                    textStyle = AppTextStyle.body.copy(fontSize = 14.sp)
                 )
             }
 
-            // Optional Email field
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    "Email (Optional)",
-                    style = AppTextStyle.labelSmall.copy(color = FunkyTextPrimary, fontWeight = FontWeight.SemiBold)
-                )
-                TextField(
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text("Email (Optional)", style = AppTextStyle.labelSmall.copy(color = FunkyTextSecondary))
+                OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text("email@example.com", style = AppTextStyle.body.copy(color = FunkyTextTertiary)) },
-                    shape = RoundedCornerShape(16.dp),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = FunkySurfaceElevated,
+                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                    placeholder = { Text("email@example.com", style = AppTextStyle.body.copy(color = FunkyTextTertiary, fontSize = 14.sp)) },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = FunkyYellow,
+                        unfocusedBorderColor = FunkyBorder,
                         unfocusedContainerColor = FunkySurfaceElevated,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        cursorColor = FunkyYellow
+                        focusedContainerColor = FunkySurfaceElevated
                     ),
                     singleLine = true,
-                    textStyle = AppTextStyle.body
+                    textStyle = AppTextStyle.body.copy(fontSize = 14.sp)
                 )
             }
 
             Spacer(Modifier.height(8.dp))
-
-            Button(
-                onClick = { /* Submit */ },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = FunkyYellow, contentColor = FunkyTextOnYellow),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
-            ) {
-                Text("Submit Feedback", style = AppTextStyle.titleMedium.copy(fontWeight = FontWeight.Bold))
+            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(
+                    onClick = { /* Submit */ },
+                    modifier = Modifier.fillMaxWidth().height(50.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = FunkyYellow, contentColor = FunkyTextOnYellow)
+                ) {
+                    Text("Submit Feedback", style = AppTextStyle.label.copy(fontWeight = FontWeight.Bold))
+                }
+                Text("We read every feedback carefully.", style = AppTextStyle.caption.copy(color = FunkyTextTertiary))
             }
         }
     }

@@ -6,6 +6,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -18,11 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.itsraj.funkytalk.ui.theme.FunkySurface
-import com.itsraj.funkytalk.ui.theme.FunkySurfaceElevated
-import com.itsraj.funkytalk.ui.theme.FunkyTextPrimary
-import com.itsraj.funkytalk.ui.theme.FunkyTextSecondary
-import com.itsraj.funkytalk.ui.theme.Radii
+import com.itsraj.funkytalk.ui.theme.*
 
 @Composable
 fun FunkySegmentedTabs(
@@ -34,9 +31,10 @@ fun FunkySegmentedTabs(
     Box(
         modifier = modifier
             .fillMaxWidth()
+            .height(Sizes.tabBarHeight)
             .clip(RoundedCornerShape(Radii.pill))
             .background(FunkySurfaceElevated)
-            .padding(3.dp)
+            .padding(4.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth()
@@ -57,15 +55,16 @@ fun FunkySegmentedTabs(
                             indication = null,
                             onClick = { onTabSelected(index) }
                         )
-                        .padding(vertical = 9.dp),
+                        .fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = label,
-                        fontSize = 14.sp,
-                        fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                        color = if (isSelected) FunkyTextPrimary else FunkyTextSecondary,
-                        letterSpacing = if (isSelected) 0.sp else 0.1.sp
+                        style = AppTextStyle.label.copy(
+                            fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal,
+                            color = if (isSelected) FunkyTextPrimary else FunkyTextSecondary,
+                            fontSize = 14.sp
+                        )
                     )
                 }
             }

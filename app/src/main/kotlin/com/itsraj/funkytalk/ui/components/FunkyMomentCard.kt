@@ -1,19 +1,14 @@
 package com.itsraj.funkytalk.ui.components
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Message
-import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ChatBubbleOutline
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -21,137 +16,71 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.itsraj.funkytalk.ui.theme.AppShapes
-import com.itsraj.funkytalk.ui.theme.Elevations
-import com.itsraj.funkytalk.ui.theme.FunkySurface
-import com.itsraj.funkytalk.ui.theme.FunkyTextPrimary
-import com.itsraj.funkytalk.ui.theme.FunkyTextSecondary
-import com.itsraj.funkytalk.ui.theme.Radii
-import com.itsraj.funkytalk.ui.theme.Sizes
-import com.itsraj.funkytalk.ui.theme.Spacing
+import com.itsraj.funkytalk.ui.theme.*
 
 @Composable
 fun FunkyMomentCard(
-    username: String,
+    author: String,
     avatarUrl: String?,
+    time: String,
     content: String,
-    imageUrl: String?,
-    likeCount: Int,
-    commentCount: Int,
-    timestamp: String,
-    onLike: () -> Unit,
-    onComment: () -> Unit,
+    images: List<String> = emptyList(),
     modifier: Modifier = Modifier
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
+        color = FunkySurfaceElevated,
         shape = AppShapes.card,
-        color = FunkySurface,
-        tonalElevation = Elevations.card,
-        shadowElevation = Elevations.card
+        shadowElevation = 0.dp
     ) {
-        Column(
-            modifier = Modifier.padding(Sizes.cardPaddingMd)
-        ) {
-            // Header
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                FunkyAvatar(
-                    url = avatarUrl,
-                    username = username,
-                    size = Sizes.avatarSm
-                )
-                Spacer(modifier = Modifier.width(Spacing.sm))
-                Column {
-                    Text(
-                        text = username,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = FunkyTextPrimary
-                    )
-                    Text(
-                        text = timestamp,
-                        fontSize = 11.sp,
-                        color = FunkyTextSecondary
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(Spacing.element))
-
-            // Content
-            Text(
-                text = content,
-                fontSize = 14.sp,
-                color = FunkyTextPrimary,
-                lineHeight = 20.sp,
-                maxLines = 4,
-                overflow = TextOverflow.Ellipsis
-            )
-
-            // Image
-            if (imageUrl != null) {
-                Spacer(modifier = Modifier.height(Spacing.element))
+        Column(Modifier.padding(14.dp)) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 AsyncImage(
-                    model = imageUrl,
+                    model = avatarUrl ?: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400",
                     contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .clip(RoundedCornerShape(Radii.lg)),
+                    modifier = Modifier.size(32.dp).clip(CircleShape),
                     contentScale = ContentScale.Crop
                 )
+                Column(Modifier.weight(1f)) {
+                    Text(author, style = AppTextStyle.label.copy(fontWeight = FontWeight.SemiBold, fontSize = 13.sp))
+                    Text(time, style = AppTextStyle.caption.copy(color = FunkyTextSecondary, fontSize = 10.sp))
+                }
+                Icon(Icons.Outlined.MoreVert, null, tint = FunkyTextTertiary, modifier = Modifier.size(18.dp))
             }
 
-            Spacer(modifier = Modifier.height(Spacing.element))
+            Spacer(Modifier.height(10.dp))
+            Text(content, style = AppTextStyle.body.copy(fontSize = 13.sp, lineHeight = 18.sp))
 
-            // Actions
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(Spacing.lg),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable(onClick = onLike)
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.FavoriteBorder,
-                        contentDescription = "Like",
-                        modifier = Modifier.size(18.dp),
-                        tint = FunkyTextSecondary
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = likeCount.toString(),
-                        fontSize = 12.sp,
-                        color = FunkyTextSecondary
-                    )
+            if (images.isNotEmpty()) {
+                Spacer(Modifier.height(10.dp))
+                Row(Modifier.fillMaxWidth().height(120.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    images.forEach { img ->
+                        AsyncImage(
+                            model = img,
+                            contentDescription = null,
+                            modifier = Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(12.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
                 }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable(onClick = onComment)
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Outlined.Message,
-                        contentDescription = "Comment",
-                        modifier = Modifier.size(18.dp),
-                        tint = FunkyTextSecondary
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = commentCount.toString(),
-                        fontSize = 12.sp,
-                        color = FunkyTextSecondary
-                    )
+            }
+
+            Spacer(Modifier.height(12.dp))
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Icon(Icons.Outlined.FavoriteBorder, null, Modifier.size(16.dp), tint = FunkyTextSecondary)
+                    Text("124", style = AppTextStyle.caption.copy(color = FunkyTextSecondary))
                 }
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Icon(Icons.Outlined.ChatBubbleOutline, null, Modifier.size(16.dp), tint = FunkyTextSecondary)
+                    Text("48", style = AppTextStyle.caption.copy(color = FunkyTextSecondary))
+                }
+                Icon(Icons.Outlined.Share, null, Modifier.size(16.dp), tint = FunkyTextSecondary)
             }
         }
     }
