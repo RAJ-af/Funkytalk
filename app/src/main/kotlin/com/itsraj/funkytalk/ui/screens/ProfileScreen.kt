@@ -52,13 +52,12 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
         ) {
-            // ─── Header Section (Banner + Avatar) ─────────────────
+            // Header Section
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(240.dp)
             ) {
-                // Banner
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -77,7 +76,6 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
                     )
                 }
 
-                // Avatar + Flag Overlay
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
@@ -97,7 +95,6 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
                             contentScale = ContentScale.Crop
                         )
                     }
-                    // Flag Badge
                     Surface(
                         modifier = Modifier
                             .align(Alignment.BottomStart)
@@ -113,7 +110,6 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
                     }
                 }
 
-                // Settings Icon (Top Right)
                 IconButton(
                     onClick = { showSettings = true },
                     modifier = Modifier
@@ -126,7 +122,6 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
                 }
             }
 
-            // ─── User Info Section ──────────────────────────────
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -158,7 +153,6 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
 
                 Spacer(Modifier.height(24.dp))
 
-                // Stats Row
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(32.dp)
@@ -171,7 +165,6 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
 
             Spacer(Modifier.height(28.dp))
 
-            // ─── Content Tabs ──────────────────────────────────
             Column(Modifier.padding(horizontal = 24.dp)) {
                 ProfileTabs(
                     tabs = listOf("Moments", "About", "Badges"),
@@ -182,7 +175,6 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
 
                 Spacer(Modifier.height(20.dp))
 
-                // Tab Content
                 when (selectedTab) {
                     0 -> {
                         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -219,10 +211,9 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
                 }
             }
 
-            Spacer(Modifier.height(100.dp)) // Extra space for bottom nav
+            Spacer(Modifier.height(100.dp))
         }
 
-        // ─── Settings Bottom Sheet ───────────────────────────
         if (showSettings) {
             ModalBottomSheet(
                 onDismissRequest = { showSettings = false },
@@ -369,7 +360,7 @@ fun UnifiedBadge(gender: String, age: Int) {
             )
             Box(Modifier.size(3.dp).clip(CircleShape).background(FunkyTextOnYellow.copy(alpha = 0.4f)))
             Text(
-                " Years",
+                "$age Years",
                 style = AppTextStyle.label.copy(
                     color = FunkyTextOnYellow,
                     fontWeight = FontWeight.Medium,
