@@ -18,6 +18,8 @@ import com.itsraj.funkytalk.FunkyTalkApp
 import com.itsraj.funkytalk.data.repository.AnnouncementRepository
 import com.itsraj.funkytalk.data.repository.VoiceRoomRepository
 import com.itsraj.funkytalk.viewmodel.*
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 
 @Composable
 fun MainAppScreen() {
@@ -109,6 +111,35 @@ fun FunkyNavHost(
         composable(Screen.Chats.route) { ChatsScreen(navController) }
         composable(Screen.Profile.route) { ProfileScreen(navController, authViewModel) }
         composable(Screen.EditProfile.route) { EditProfileScreen(navController, authViewModel) }
+
+        // Settings Screens
+        composable(Screen.BlockedUsers.route) {
+            BlockedUsersScreen(onBack = { navController.popBackStack() })
+        }
+        composable(Screen.About.route) {
+            AboutScreen(
+                onBack = { navController.popBackStack() },
+                onNavigateToPrivacy = {
+                    navController.navigate(Screen.WebView.createRoute("Privacy Policy", "https://lost39.github.io/funkytalk/#"))
+                },
+                onNavigateToTerms = {
+                    navController.navigate(Screen.WebView.createRoute("Terms of Service", "https://lost39.github.io/funkytalk/#"))
+                }
+            )
+        }
+        composable(Screen.Feedback.route) {
+            FeedbackScreen(onBack = { navController.popBackStack() })
+        }
+        composable(Screen.WebView.route) { backStackEntry ->
+            val title = backStackEntry.arguments?.getString("title")?.let {
+                URLDecoder.decode(it, StandardCharsets.UTF_8.toString())
+            } ?: "Web View"
+            val url = backStackEntry.arguments?.getString("url")?.let {
+                URLDecoder.decode(it, StandardCharsets.UTF_8.toString())
+            } ?: ""
+            WebViewScreen(title = title, url = url, onBack = { navController.popBackStack() })
+        }
+
         composable(
             route = Screen.VoiceRoom.route,
             arguments = listOf(

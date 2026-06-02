@@ -3,21 +3,16 @@ package com.itsraj.funkytalk.ui.screens
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
-import androidx.compose.material.icons.automirrored.outlined.Message
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -25,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.itsraj.funkytalk.ui.components.ProfileTabs
+import com.itsraj.funkytalk.ui.components.FunkySegmentedTabs
 import com.itsraj.funkytalk.ui.navigation.Screen
 import com.itsraj.funkytalk.ui.theme.*
 import com.itsraj.funkytalk.viewmodel.AuthViewModel
@@ -33,199 +28,182 @@ import com.itsraj.funkytalk.viewmodel.AuthViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
-    var selectedTab by remember { mutableIntStateOf(0) }
+    val userProfile by authViewModel.userProfile.collectAsState()
+    val scrollState = rememberScrollState()
     var showSettings by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState()
 
-    val userProfile = authViewModel.userProfile.collectAsState().value
-    val username = userProfile?.profile_name ?: "Rajdeep Singh"
-    val bio = userProfile?.bio ?: "Building something cool with Gen-Z vibes."
-    val avatarUrl = userProfile?.avatar_url ?: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400"
-    val bannerUrl = "https://images.unsplash.com/photo-1506744038136-46273834b3fb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080"
+    val bannerUrl = "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=1000"
+    val avatarUrl = userProfile?.avatar_url ?: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400"
 
-    Scaffold(
-        containerColor = FunkyBackground
-    ) { padding ->
+    Box(Modifier.fillMaxSize().background(FunkyBackground)) {
         Column(
-            modifier = Modifier
+            Modifier
                 .fillMaxSize()
-                .padding(padding)
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(scrollState)
         ) {
-            // Header Section
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(240.dp)
-            ) {
-                Box(
+            // Header Section (Banner + Avatar Overlay)
+            Box(Modifier.fillMaxWidth().height(260.dp)) {
+                // Banner
+                AsyncImage(
+                    model = bannerUrl,
+                    contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(180.dp)
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(FunkyYellow.copy(alpha = 0.8f), FunkyYellow.copy(alpha = 0.4f))
-                            )
-                        )
-                ) {
-                    AsyncImage(
-                        model = bannerUrl,
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                }
+                        .height(200.dp),
+                    contentScale = ContentScale.Crop
+                )
 
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(end = 24.dp)
-                        .size(110.dp)
-                ) {
-                    Surface(
-                        modifier = Modifier.size(96.dp),
-                        shape = CircleShape,
+                // Top-Left @Username (Inside Banner)
+                Text(
+                    text = "@${userProfile?.username ?: "username"}",
+                    style = AppTextStyle.label.copy(
                         color = Color.White,
-                        border = BorderStroke(4.dp, FunkyBackground)
-                    ) {
-                        AsyncImage(
-                            model = avatarUrl,
-                            contentDescription = null,
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
-                        )
-                    }
-                    Surface(
-                        modifier = Modifier
-                            .align(Alignment.BottomStart)
-                            .padding(bottom = 14.dp)
-                            .size(32.dp),
-                        shape = CircleShape,
-                        color = Color.White,
-                        shadowElevation = 4.dp
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Text(getFlagEmoji(userProfile?.country ?: "IN"), fontSize = 18.sp)
-                        }
-                    }
-                }
+                        fontWeight = FontWeight.Bold,
+                        shadow = androidx.compose.ui.graphics.Shadow(Color.Black.copy(alpha = 0.5f), blurRadius = 4f)
+                    ),
+                    modifier = Modifier.padding(start = 20.dp, top = 20.dp)
+                )
 
+                // Top-Right Settings Icon (Inside Banner)
                 IconButton(
                     onClick = { showSettings = true },
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .padding(16.dp)
-                        .size(40.dp)
-                        .background(Color.Black.copy(alpha = 0.2f), CircleShape)
+                        .padding(top = 10.dp, end = 10.dp)
                 ) {
-                    Icon(Icons.Outlined.Settings, null, tint = Color.White, modifier = Modifier.size(20.dp))
+                    Icon(
+                        Icons.Outlined.Settings,
+                        contentDescription = "Settings",
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+
+                // Overlapping Avatar (Bottom-Left)
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(start = 20.dp, bottom = 0.dp)
+                ) {
+                    AsyncImage(
+                        model = avatarUrl,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(CircleShape)
+                            .border(4.dp, FunkyBackground, CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+
+                    // Country Flag Badge (Bottom-Right of Avatar)
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .offset(x = (-4).dp, y = (-4).dp)
+                            .size(28.dp)
+                            .background(Color.White, CircleShape)
+                            .padding(2.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            getFlagEmoji(userProfile?.country ?: "IN"),
+                            fontSize = 16.sp
+                        )
+                    }
                 }
             }
 
-            Column(
-                modifier = Modifier
+            // Stats Centered Below Banner
+            Row(
+                Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
+                    .padding(vertical = 12.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                StatItem("2.4k", "Followers")
+                Spacer(Modifier.width(40.dp))
+                StatItem("842", "Following")
+            }
+
+            // User Info Section
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+            ) {
+                // Display Name Below Avatar Area
                 Text(
-                    text = username,
-                    style = AppTextStyle.displaySmall.copy(
-                        color = FunkyTextPrimary,
-                        fontWeight = FontWeight.Black,
-                        letterSpacing = (-0.5).sp
-                    )
+                    userProfile?.profile_name ?: "Display Name",
+                    style = AppTextStyle.headline.copy(fontSize = 22.sp, fontWeight = FontWeight.Bold)
                 )
 
                 Spacer(Modifier.height(4.dp))
 
+                // Bio Below Display Name
                 Text(
-                    text = bio,
-                    style = AppTextStyle.body.copy(
-                        color = FunkyTextSecondary,
-                        lineHeight = 20.sp,
-                        fontSize = 14.sp
+                    userProfile?.bio ?: "No bio yet. Tap settings to edit your profile.",
+                    style = AppTextStyle.body.copy(color = FunkyTextSecondary, lineHeight = 20.sp)
+                )
+
+                Spacer(Modifier.height(12.dp))
+
+                // Gender-Age Pill
+                UnifiedBadge(userProfile?.gender ?: "Unknown", userProfile?.age ?: 0)
+            }
+
+            Spacer(Modifier.height(24.dp))
+
+            // Segmented Tabs
+            var selectedTab by remember { mutableStateOf(0) }
+            FunkySegmentedTabs(
+                tabs = listOf("Feed", "About"),
+                selectedIndex = selectedTab,
+                onTabSelected = { selectedTab = it },
+                modifier = Modifier.padding(horizontal = 20.dp)
+            )
+
+            Spacer(Modifier.height(16.dp))
+
+            // Tab Content
+            if (selectedTab == 0) {
+                Column(Modifier.padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    MomentCard(
+                        author = userProfile?.profile_name ?: "Me",
+                        avatarUrl = avatarUrl,
+                        time = "2 hours ago",
+                        content = "Enjoying the sunset! #lifestyle #vibes",
+                        images = listOf(
+                            "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800",
+                            "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800"
+                        )
                     )
-                )
-
-                Spacer(Modifier.height(16.dp))
-
-                UnifiedBadge(gender = userProfile?.gender ?: "Male", age = userProfile?.age ?: 22)
-
-                Spacer(Modifier.height(24.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(32.dp)
-                ) {
-                    StatItem("1.2k", "Followers")
-                    StatItem("482", "Following")
-                    StatItem("15k", "Hearts")
+                    Spacer(Modifier.height(80.dp)) // Bottom Nav Padding
+                }
+            } else {
+                Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
+                    AboutSection("Native Language", (userProfile?.native_languages ?: listOf("English")).joinToString(", "))
+                    AboutSection("Learning", (userProfile?.learning_languages ?: listOf("Spanish", "French")).joinToString(", "))
+                    AboutSection("Hobbies", (userProfile?.hobbies ?: listOf("Music", "Travel", "Photography")).joinToString(", "))
+                    Spacer(Modifier.height(80.dp))
                 }
             }
-
-            Spacer(Modifier.height(28.dp))
-
-            Column(Modifier.padding(horizontal = 24.dp)) {
-                ProfileTabs(
-                    tabs = listOf("Moments", "About", "Badges"),
-                    selectedIndex = selectedTab,
-                    onTabSelected = { selectedTab = it },
-                    modifier = Modifier.height(52.dp)
-                )
-
-                Spacer(Modifier.height(20.dp))
-
-                when (selectedTab) {
-                    0 -> {
-                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                            MomentCard(
-                                author = username,
-                                avatarUrl = avatarUrl,
-                                time = "2h ago",
-                                content = "Just had the best coffee in town! ☕✨ #lifestyle",
-                                images = listOf(
-                                    "https://images.unsplash.com/photo-1509042239860-f550ce710b93?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800",
-                                    "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800"
-                                )
-                            )
-                        }
-                    }
-                    1 -> {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(FunkySurfaceElevated, RoundedCornerShape(24.dp))
-                                .padding(20.dp),
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            AboutSection("Languages", "Native in Hindi, English. Learning French.")
-                            AboutSection("Interests", "Coding, Music, Travel, Gaming")
-                            AboutSection("Joined", "March 2024")
-                        }
-                    }
-                    2 -> {
-                        Box(Modifier.fillMaxWidth().height(100.dp), contentAlignment = Alignment.Center) {
-                            Text("No badges yet.", color = FunkyTextTertiary)
-                        }
-                    }
-                }
-            }
-
-            Spacer(Modifier.height(100.dp))
         }
 
+        // Settings Bottom Sheet
         if (showSettings) {
             ModalBottomSheet(
                 onDismissRequest = { showSettings = false },
-                sheetState = sheetState,
-                containerColor = FunkyBackground,
+                containerColor = FunkySurface,
                 dragHandle = { BottomSheetDefaults.DragHandle(color = FunkyBorder) }
             ) {
                 SettingsContent(
                     navController = navController,
                     onLogout = {
-                        showSettings = false
                         authViewModel.logout()
+                        navController.navigate(Screen.Auth.route) {
+                            popUpTo(0)
+                        }
                     },
                     onDismiss = { showSettings = false }
                 )
@@ -249,10 +227,27 @@ fun SettingsContent(navController: NavController, onLogout: () -> Unit, onDismis
         )
 
         SettingsItem(Icons.Outlined.Edit, "Edit Profile", onClick = { onDismiss(); navController.navigate(Screen.EditProfile.route) })
-        SettingsItem(Icons.Outlined.Block, "Blocked Users", onClick = onDismiss)
-        SettingsItem(Icons.Outlined.PrivacyTip, "Privacy Policy", onClick = onDismiss)
-        SettingsItem(Icons.Outlined.Info, "About FunkyTalk", onClick = onDismiss)
-        SettingsItem(Icons.Outlined.Feedback, "Feedback", onClick = onDismiss)
+        SettingsItem(Icons.Outlined.Block, "Blocked Users", onClick = { onDismiss(); navController.navigate(Screen.BlockedUsers.route) })
+
+        SettingsItem(
+            Icons.Outlined.PrivacyTip,
+            "Privacy Policy",
+            onClick = {
+                onDismiss()
+                navController.navigate(Screen.WebView.createRoute("Privacy Policy", "https://lost39.github.io/funkytalk/#"))
+            }
+        )
+        SettingsItem(
+            Icons.Outlined.Description,
+            "Terms of Service",
+            onClick = {
+                onDismiss()
+                navController.navigate(Screen.WebView.createRoute("Terms of Service", "https://lost39.github.io/funkytalk/#"))
+            }
+        )
+
+        SettingsItem(Icons.Outlined.Info, "About FunkyTalk", onClick = { onDismiss(); navController.navigate(Screen.About.route) })
+        SettingsItem(Icons.Outlined.Feedback, "Feedback", onClick = { onDismiss(); navController.navigate(Screen.Feedback.route) })
 
         Spacer(Modifier.height(8.dp))
         HorizontalDivider(color = FunkyBorderLight)
@@ -391,7 +386,7 @@ fun MomentCard(
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     AsyncImage(
-                        model = avatarUrl ?: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400",
+                        model = avatarUrl ?: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400",
                         contentDescription = null,
                         modifier = Modifier
                             .size(36.dp)
@@ -414,7 +409,7 @@ fun MomentCard(
                     }
                 }
                 Icon(
-                    Icons.Default.MoreVert,
+                    Icons.Outlined.MoreVert,
                     contentDescription = null,
                     tint = FunkyTextTertiary,
                     modifier = Modifier.size(18.dp)

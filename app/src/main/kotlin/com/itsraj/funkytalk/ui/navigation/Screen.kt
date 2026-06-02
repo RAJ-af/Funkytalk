@@ -21,6 +21,19 @@ sealed class Screen(val route: String) {
     object Chats : Screen("chats")
     object Profile : Screen("profile")
     object EditProfile : Screen("edit_profile")
+
+    // Settings Screens
+    object BlockedUsers : Screen("blocked_users")
+    object About : Screen("about")
+    object Feedback : Screen("feedback")
+    object WebView : Screen("webview/{title}/{url}") {
+        fun createRoute(title: String, url: String): String {
+            val encodedUrl = URLEncoder.encode(url, StandardCharsets.UTF_8.toString())
+            val encodedTitle = URLEncoder.encode(title, StandardCharsets.UTF_8.toString())
+            return "webview/$encodedTitle/$encodedUrl"
+        }
+    }
+
     object VoiceRoom : Screen("voice_room/{roomId}?role={role}") {
         fun createRoute(roomId: String, role: String = "listener") = "voice_room/$roomId?role=$role"
     }
