@@ -3,7 +3,10 @@ package com.itsraj.funkytalk.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.itsraj.funkytalk.data.model.UserProfile
+import com.itsraj.funkytalk.data.model.Moment
 import com.itsraj.funkytalk.data.repository.AuthRepository
+import com.itsraj.funkytalk.data.repository.FollowerRepository
+import com.itsraj.funkytalk.data.repository.MomentsRepository
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.exception.AuthRestException
 import kotlinx.coroutines.FlowPreview
@@ -26,7 +29,9 @@ sealed class AuthState {
 }
 
 class AuthViewModel(
-    private val repository: AuthRepository = AuthRepository()
+    private val repository: AuthRepository = AuthRepository(),
+    private val followerRepository: FollowerRepository = FollowerRepository(),
+    private val momentsRepo: MomentsRepository = MomentsRepository()
 ) : ViewModel() {
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.Idle)
@@ -39,6 +44,11 @@ class AuthViewModel(
     val usernameAvailable = _usernameAvailable.asStateFlow()
 
     private val _usernameQuery = MutableStateFlow("")
+
+    private val _followerCount = MutableStateFlow(0)
+    val followerCount = _followerCount.asStateFlow()
+    private val _followingCount = MutableStateFlow(0)
+    val followingCount = _followingCount.asStateFlow()
 
     val currentUser get() = repository.currentUser
 
@@ -119,6 +129,9 @@ class AuthViewModel(
                 } else {
                     _userProfile.value = profile
                     _authState.value = AuthState.Authenticated
+                    // Fetch follower counts
+                    _followerCount.value = followerRepository.getFollowerCount(user.id)
+                    _followingCount.value = followerRepository.getFollowingCount(user.id)
                 }
             }
         }

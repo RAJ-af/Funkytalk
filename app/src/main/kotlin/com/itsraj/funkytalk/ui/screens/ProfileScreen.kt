@@ -27,7 +27,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.itsraj.funkytalk.ui.navigation.Screen
+import com.itsraj.funkytalk.data.model.Moment
+import com.itsraj.funkytalk.data.model.allCountries
+import com.itsraj.funkytalk.data.repository.MomentsRepository
+import com.itsraj.funkytalk.ui.components.CircularFlag
 import com.itsraj.funkytalk.ui.theme.*
+import com.itsraj.funkytalk.viewmodel.AuthState
 import com.itsraj.funkytalk.viewmodel.AuthViewModel
 
 private val TABS = listOf("Moments", "About")
@@ -37,6 +43,24 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
     val profile by authViewModel.userProfile.collectAsState()
     var tab by remember { mutableIntStateOf(0) }
     var showSettings by remember { mutableStateOf(false) }
+
+    val authState by authViewModel.authState.collectAsState()
+    val followerCount by authViewModel.followerCount.collectAsState()
+    val followingCount by authViewModel.followingCount.collectAsState()
+    var moments by remember { mutableStateOf<List<Moment>>(emptyList()) }
+    val momentsRepo = remember { MomentsRepository() }
+
+    LaunchedEffect(Unit) {
+        moments = momentsRepo.getFeedMoments()
+    }
+
+    LaunchedEffect(authState) {
+        if (authState is AuthState.Unauthenticated) {
+            navController.navigate(Screen.Welcome.route) {
+                popUpTo(0) { inclusive = true }
+            }
+        }
+    }
 
     val scrollState = rememberScrollState()
     val p = profile ?: return Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -110,8 +134,8 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
                         modifier = Modifier.padding(bottom = 8.dp),
                         horizontalArrangement = Arrangement.spacedBy(24.dp)
                     ) {
-                        StatItem("512", "Followers")
-                        StatItem("320", "Following")
+                        StatItem("$followerCount", "Followers")
+                        StatItem("$followingCount", "Following")
                     }
 
                     // Avatar with Flag overlap (Right)
@@ -130,18 +154,18 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
                             )
                         }
 
-                        // Circular Flag Badge (Bottom Right)
-                        Surface(
-                            modifier = Modifier.size(30.dp).offset(x = 2.dp, y = 2.dp),
-                            shape = CircleShape,
-                            color = Color.White,
-                            border = BorderStroke(1.5.dp, Color.White)
-                        ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                Text(
-                                    text = getFlagEmoji(p.country ?: "IN"),
-                                    style = TextStyle(fontSize = 15.sp)
-                                )
+                        // Circular Flag Badge (Bottom Right) — real flag image
+                        val countryEntry = allCountries.find { it.code == p.country }
+                        if (countryEntry != null) {
+                            Surface(
+                                modifier = Modifier.size(30.dp).offset(x = 2.dp, y = 2.dp),
+                                shape = CircleShape,
+                                color = Color.White,
+                                border = BorderStroke(1.5.dp, Color.White)
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    CircularFlag(code = countryEntry.code, size = 22.dp)
+                                }
                             }
                         }
                     }
@@ -192,18 +216,23 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
             // ═══════ TAB CONTENT ═════════════════════════════════
             Box(Modifier.padding(horizontal = 16.dp)) {
                 if (tab == 0) {
-                    // Moments Feed
+                    // Moments Feed — real data from Supabase
                     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                        MomentCard(
-                            author = name,
-                            avatarUrl = p.avatar_url,
-                            time = "2 hours ago",
-                            content = "Exploring the hidden gems of the city today. The architecture here is breathtaking! 🏛️✨",
-                            images = listOf(
-                                "https://images.unsplash.com/photo-1520310809185-5cc119cf8b08?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400",
-                                "https://images.unsplash.com/photo-1778461456551-2126d8a7fa67?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400"
-                            )
-                        )
+                        if (moments.isEmpty()) {
+                            MomentCard(author = name, avatarUrl = p.avatar_url, time = "", content = "No moments yet. Start sharing!", images = emptyList(), likes = 0, comments = 0)
+                        } else {
+                            moments.forEach { m ->
+                                MomentCard(
+                                    author = name,
+                                    avatarUrl = p.avatar_url,
+                                    time = m.created_at ?: "",
+                                    content = m.content,
+                                    images = m.image_urls ?: emptyList(),
+                                    likes = m.likes_count,
+                                    comments = m.comments_count
+                                )
+                            }
+                        }
                     }
                 } else {
                     // About Tab
@@ -285,7 +314,7 @@ fun UnifiedBadge(gender: String, age: Int) {
 }
 
 @Composable
-fun MomentCard(author: String, avatarUrl: String?, time: String, content: String, images: List<String>) {
+fun MomentCard(author: String, avatarUrl: String?, time: String, content: String, images: List<String>, likes: Int = 124, comments: Int = 48) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         color = FunkySurface,
@@ -336,11 +365,11 @@ fun MomentCard(author: String, avatarUrl: String?, time: String, content: String
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     Icon(Icons.Outlined.FavoriteBorder, null, Modifier.size(18.dp), tint = FunkyTextSecondary)
-                    Text("124", style = AppTextStyle.label.copy(color = FunkyTextSecondary, fontSize = 12.sp))
+                    Text("$likes", style = AppTextStyle.label.copy(color = FunkyTextSecondary, fontSize = 12.sp))
                 }
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     Icon(Icons.Outlined.ChatBubbleOutline, null, Modifier.size(16.dp), tint = FunkyTextSecondary)
-                    Text("48", style = AppTextStyle.label.copy(color = FunkyTextSecondary, fontSize = 12.sp))
+                    Text("$comments", style = AppTextStyle.label.copy(color = FunkyTextSecondary, fontSize = 12.sp))
                 }
                 Icon(Icons.Outlined.Share, null, Modifier.size(18.dp), tint = FunkyTextSecondary)
             }
@@ -348,9 +377,3 @@ fun MomentCard(author: String, avatarUrl: String?, time: String, content: String
     }
 }
 
-fun getFlagEmoji(countryCode: String): String {
-    if (countryCode.length != 2) return "🇮🇳"
-    val firstLetter = Character.codePointAt(countryCode.uppercase(), 0) - 0x41 + 0x1F1E6
-    val secondLetter = Character.codePointAt(countryCode.uppercase(), 1) - 0x41 + 0x1F1E6
-    return String(Character.toChars(firstLetter)) + String(Character.toChars(secondLetter))
-}
