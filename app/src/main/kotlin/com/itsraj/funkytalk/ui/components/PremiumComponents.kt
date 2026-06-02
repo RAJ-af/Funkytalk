@@ -1,12 +1,12 @@
 package com.itsraj.funkytalk.ui.components
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
@@ -14,26 +14,159 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Message
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.itsraj.funkytalk.ui.theme.MangoYellow
+import coil.compose.AsyncImage
+import com.itsraj.funkytalk.ui.theme.*
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
+
+@Composable
+fun MeshGradient(modifier: Modifier = Modifier) {
+    val infiniteTransition = rememberInfiniteTransition(label = "mesh")
+
+    val xOffset1 by infiniteTransition.animateFloat(
+        initialValue = 0f, targetValue = 100f,
+        animationSpec = infiniteRepeatable(tween(10000, easing = LinearEasing), RepeatMode.Reverse), label = "x1"
+    )
+    val yOffset1 by infiniteTransition.animateFloat(
+        initialValue = 0f, targetValue = 50f,
+        animationSpec = infiniteRepeatable(tween(8000, easing = LinearEasing), RepeatMode.Reverse), label = "y1"
+    )
+
+    val xOffset2 by infiniteTransition.animateFloat(
+        initialValue = 100f, targetValue = 0f,
+        animationSpec = infiniteRepeatable(tween(12000, easing = LinearEasing), RepeatMode.Reverse), label = "x2"
+    )
+    val yOffset2 by infiniteTransition.animateFloat(
+        initialValue = 50f, targetValue = 0f,
+        animationSpec = infiniteRepeatable(tween(9000, easing = LinearEasing), RepeatMode.Reverse), label = "y2"
+    )
+
+    Box(modifier = modifier.clip(RoundedCornerShape(0.dp))) {
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            translate(left = xOffset1, top = yOffset1) {
+                drawCircle(
+                    brush = Brush.radialGradient(
+                        colors = listOf(MeshPink.copy(alpha = 0.8f), Color.Transparent),
+                        center = center,
+                        radius = size.maxDimension * 0.8f
+                    ),
+                    radius = size.maxDimension * 0.8f,
+                    center = center.copy(x = size.width * 0.2f, y = size.height * 0.2f)
+                )
+            }
+            translate(left = xOffset2, top = yOffset2) {
+                drawCircle(
+                    brush = Brush.radialGradient(
+                        colors = listOf(MeshPurple.copy(alpha = 0.7f), Color.Transparent),
+                        center = center,
+                        radius = size.maxDimension * 0.8f
+                    ),
+                    radius = size.maxDimension * 0.8f,
+                    center = center.copy(x = size.width * 0.8f, y = size.height * 0.3f)
+                )
+            }
+            drawCircle(
+                brush = Brush.radialGradient(
+                    colors = listOf(MeshCyan.copy(alpha = 0.6f), Color.Transparent),
+                    center = center,
+                    radius = size.maxDimension * 0.7f
+                ),
+                radius = size.maxDimension * 0.7f,
+                center = center.copy(x = size.width * 0.5f, y = size.height * 0.7f)
+            )
+            drawCircle(
+                brush = Brush.radialGradient(
+                    colors = listOf(MeshYellow.copy(alpha = 0.5f), Color.Transparent),
+                    center = center,
+                    radius = size.maxDimension * 0.6f
+                ),
+                radius = size.maxDimension * 0.6f,
+                center = center.copy(x = size.width * 0.3f, y = size.height * 0.8f)
+            )
+        }
+    }
+}
+
+@Composable
+fun GroupedCard(
+    modifier: Modifier = Modifier,
+    title: String? = null,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Column(modifier = modifier) {
+        if (title != null) {
+            Text(
+                text = title,
+                style = AppTextStyle.labelSmall.copy(
+                    color = FunkyTextSecondary,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 11.sp
+                ),
+                modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
+            )
+        }
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(20.dp),
+            color = FunkySurfaceElevated,
+            border = BorderStroke(1.dp, FunkyBorderLight)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                content()
+            }
+        }
+    }
+}
+
+@Composable
+fun GlassyBottomDock(
+    modifier: Modifier = Modifier,
+    content: @Composable RowScope.() -> Unit
+) {
+    Surface(
+        modifier = modifier
+            .padding(horizontal = 24.dp, vertical = 12.dp)
+            .height(64.dp)
+            .fillMaxWidth(),
+        color = Color.White.copy(alpha = 0.8f),
+        shape = RoundedCornerShape(32.dp),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f)),
+        shadowElevation = 8.dp
+    ) {
+        Row(
+            modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceAround
+        ) {
+            content()
+        }
+    }
+}
+
+// ─── Restoring Legacy Premium Components to fix build ─────
 
 @Composable
 fun PremiumButton(
@@ -46,7 +179,7 @@ fun PremiumButton(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
-    val scale by animateFloatAsState(if (isPressed) 0.95f else 1f)
+    val scale by animateFloatAsState(if (isPressed) 0.95f else 1f, label = "scale")
 
     Box(
         modifier = modifier
@@ -140,12 +273,6 @@ fun VerticalWheelPicker(
     content: @Composable (index: Int, isSelected: Boolean) -> Unit
 ) {
     val listState = rememberLazyListState(initialFirstVisibleItemIndex = initialIndex)
-    val flingBehavior = rememberSnapFlingBehavior(lazyListState = listState)
-    val density = LocalDensity.current
-
-    // Transparent items for padding at top and bottom
-    val itemsToShow = 3
-    val totalCount = count + itemsToShow - 1
 
     LaunchedEffect(listState) {
         snapshotFlow { listState.firstVisibleItemIndex }
@@ -157,11 +284,10 @@ fun VerticalWheelPicker(
 
     Box(
         modifier = modifier
-            .height(itemHeight * itemsToShow)
+            .height(itemHeight * 3)
             .fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
-        // Selection highlight
         Box(
             modifier = Modifier
                 .height(itemHeight)
@@ -173,7 +299,6 @@ fun VerticalWheelPicker(
 
         LazyColumn(
             state = listState,
-            flingBehavior = flingBehavior,
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(vertical = itemHeight),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -228,9 +353,9 @@ fun ModernLanguageChip(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val backgroundColor by animateColorAsState(if (isSelected) MangoYellow else Color.Black.copy(alpha = 0.05f))
-    val textColor by animateColorAsState(if (isSelected) Color.Black else Color.Black.copy(alpha = 0.8f))
-    val scale by animateFloatAsState(if (isSelected) 1.05f else 1f)
+    val backgroundColor by animateColorAsState(if (isSelected) MangoYellow else Color.Black.copy(alpha = 0.05f), label = "bg")
+    val textColor by animateColorAsState(if (isSelected) Color.Black else Color.Black.copy(alpha = 0.8f), label = "text")
+    val scale by animateFloatAsState(if (isSelected) 1.05f else 1f, label = "scale")
 
     Surface(
         modifier = Modifier
@@ -274,9 +399,9 @@ fun GenderIconButton(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val borderColor by animateColorAsState(if (isSelected) MangoYellow else Color.Black.copy(alpha = 0.05f))
-    val backgroundColor by animateColorAsState(if (isSelected) MangoYellow.copy(alpha = 0.1f) else Color.Transparent)
-    val scale by animateFloatAsState(if (isSelected) 1.1f else 1f)
+    val borderColor by animateColorAsState(if (isSelected) MangoYellow else Color.Black.copy(alpha = 0.05f), label = "border")
+    val backgroundColor by animateColorAsState(if (isSelected) MangoYellow.copy(alpha = 0.1f) else Color.Transparent, label = "bg")
+    val scale by animateFloatAsState(if (isSelected) 1.1f else 1f, label = "scale")
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,

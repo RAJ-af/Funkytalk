@@ -1,16 +1,13 @@
 package com.itsraj.funkytalk.ui.components
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -36,21 +33,13 @@ fun FunkyBottomNavigation(navController: NavController) {
         NavigationItem("Profile", Screen.Profile.route, Icons.Outlined.PersonOutline)
     )
 
-    Surface(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(Sizes.bottomNavHeight + 16.dp)
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        color = FunkySurface.copy(alpha = 0.95f),
-        shape = RoundedCornerShape(24.dp),
-        shadowElevation = 0.dp,
-        border = BorderStroke(1.dp, FunkyBorderLight)
+            .navigationBarsPadding(),
+        contentAlignment = Alignment.BottomCenter
     ) {
-        Row(
-            modifier = Modifier.fillMaxSize(),
-            horizontalArrangement = Arrangement.SpaceAround,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        GlassyBottomDock {
             items.forEach { item ->
                 val isSelected = currentRoute == item.route
                 Column(
@@ -69,18 +58,23 @@ fun FunkyBottomNavigation(navController: NavController) {
                                 }
                             }
                         )
-                        .padding(8.dp),
+                        .padding(horizontal = 12.dp),
                     verticalArrangement = Arrangement.Center
                 ) {
                     Icon(
                         imageVector = item.icon,
                         contentDescription = item.title,
                         tint = if (isSelected) FunkyYellow else FunkyTextSecondary,
-                        modifier = Modifier.size(22.dp)
+                        modifier = Modifier.size(24.dp)
                     )
                     if (isSelected) {
-                        Spacer(Modifier.height(2.dp))
-                        Box(Modifier.size(4.dp).clip(CircleShape).background(FunkyYellow))
+                        Spacer(Modifier.height(4.dp))
+                        Box(
+                            Modifier
+                                .size(4.dp)
+                                .clip(CircleShape)
+                                .background(FunkyYellow)
+                        )
                     }
                 }
             }

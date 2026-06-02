@@ -19,6 +19,12 @@ val FunkyYellow = Color(0xFFFFCC00)              // Primary accent (Requested)
 val FunkyYellowSoft = Color(0xFFFFF7CC)          // Soft yellow bg for pills
 val FunkyYellowLight = Color(0xFFFFFBE6)         // Very light yellow bg
 
+// ─── Mesh Gradient Colors ──────────────────────────────────
+val MeshPink = Color(0xFFFF9CFD)
+val MeshPurple = Color(0xFFB19CFF)
+val MeshCyan = Color(0xFF9CE6FF)
+val MeshYellow = Color(0xFFFFE39C)
+
 // ─── Borders ───────────────────────────────────────────────
 val FunkyBorder = Color(0xFFE5E5EA)              // iOS Separator
 val FunkyBorderLight = Color(0xFFF2F2F7)         // Lighter borders, dividers
@@ -32,3 +38,7 @@ val FunkyInactiveGray = Color(0xFFD1D1D6)        // Inactive tab, unselected
 // ─── Shadows ───────────────────────────────────────────────
 val FunkyShadowAmbient = Color(0x0A000000)       // Very soft shadow
 val FunkyShadowSpot = Color(0x0F000000)           // Very soft shadow
+
+// ─── Glassmorphism ──────────────────────────────────────────
+val FunkyGlassWhite = Color(0xCCFFFFFF)
+val FunkyGlassDark = Color(0x99000000)

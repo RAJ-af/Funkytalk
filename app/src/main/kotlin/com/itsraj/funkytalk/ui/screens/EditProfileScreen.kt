@@ -6,145 +6,140 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.itsraj.funkytalk.ui.components.*
 import com.itsraj.funkytalk.ui.theme.*
 import com.itsraj.funkytalk.viewmodel.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
-    val userProfile by authViewModel.userProfile.collectAsState()
-    val scrollState = rememberScrollState()
-
-    var profileName by remember { mutableStateOf(userProfile?.profile_name ?: "") }
-    var bio by remember { mutableStateOf(userProfile?.bio ?: "") }
-    var nativeLangs by remember { mutableStateOf(userProfile?.native_languages ?: emptyList()) }
-    var learningLangs by remember { mutableStateOf(userProfile?.learning_languages ?: emptyList()) }
-    var hobbies by remember { mutableStateOf(userProfile?.hobbies ?: emptyList()) }
+    var username by remember { mutableStateOf("Raj Kumar") }
+    var bio by remember { mutableStateOf("Explorer 🌍 | Tech Enthusiast 💻 | Coffee Addict ☕️\nAlways looking for new friends to chat with!") }
+    var nativeLanguages by remember { mutableStateOf(listOf("Hindi")) }
+    var learningLanguages by remember { mutableStateOf(listOf("English")) }
+    var interests by remember { mutableStateOf(listOf("Music", "Gaming", "Travel", "Coding", "Anime")) }
 
     var showInterestSheet by remember { mutableStateOf(false) }
     var showLanguageSheet by remember { mutableStateOf<String?>(null) }
 
     Scaffold(
+        containerColor = FunkyBackground,
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("Edit Profile", style = AppTextStyle.titleLarge.copy(fontWeight = FontWeight.SemiBold)) },
+            TopAppBar(
+                title = { Text("Edit Profile", style = AppTextStyle.headline.copy(fontSize = 18.sp, fontWeight = FontWeight.Bold)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = FunkyTextPrimary)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
                     }
                 },
                 actions = {
-                    TextButton(onClick = { /* Save logic */ }) {
-                        Text("Save", style = AppTextStyle.label.copy(color = FunkyYellow, fontWeight = FontWeight.Bold))
+                    TextButton(onClick = { navController.popBackStack() }) {
+                        Text("Save", color = FunkyYellow, style = AppTextStyle.label.copy(fontWeight = FontWeight.Bold))
                     }
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = FunkyBackground)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = FunkyBackground)
             )
-        },
-        containerColor = FunkyBackground
+        }
     ) { padding ->
         Column(
-            Modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .verticalScroll(scrollState)
-                .padding(bottom = 32.dp)
+                .verticalScroll(rememberScrollState())
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            // Header Image Area
-            Box(Modifier.fillMaxWidth().height(180.dp)) {
-                AsyncImage(
-                    model = "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=1000",
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxWidth().height(140.dp),
-                    contentScale = ContentScale.Crop
-                )
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(start = 24.dp)
+            // Avatar
+            Box {
+                Surface(
+                    modifier = Modifier.size(100.dp),
+                    shape = CircleShape,
+                    border = BorderStroke(2.dp, FunkyBorderLight)
                 ) {
                     AsyncImage(
-                        model = userProfile?.avatar_url ?: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400",
+                        model = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400",
                         contentDescription = null,
-                        modifier = Modifier
-                            .size(80.dp)
-                            .clip(CircleShape)
-                            .border(3.dp, FunkyBackground, CircleShape),
+                        modifier = Modifier.fillMaxSize().clip(CircleShape),
                         contentScale = ContentScale.Crop
                     )
-                    // Flag on Avatar
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .size(24.dp)
-                            .background(Color.White, CircleShape)
-                            .padding(2.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(getFlagEmoji(userProfile?.country ?: "IN"), fontSize = 14.sp)
-                    }
                 }
-
-                Surface(
-                    onClick = { /* Change Banner */ },
-                    shape = CircleShape,
-                    color = Color.Black.copy(alpha = 0.4f),
-                    modifier = Modifier.align(Alignment.Center).offset(y = (-20).dp).size(40.dp)
+                IconButton(
+                    onClick = { /* Change Avatar */ },
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .size(32.dp)
+                        .clip(CircleShape)
+                        .background(FunkyYellow)
                 ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(Icons.Default.CameraAlt, null, tint = Color.White, modifier = Modifier.size(20.dp))
-                    }
+                    Icon(Icons.Default.CameraAlt, null, tint = FunkyTextOnYellow, modifier = Modifier.size(16.dp))
                 }
             }
 
-            Column(Modifier.padding(horizontal = 24.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
-                EditField("Display Name", profileName) { profileName = it }
-                EditField("Bio", bio, singleLine = false) { bio = it }
-
-                SectionHeaderLabel("Languages")
-                LanguageRow("Native (Max 2)", nativeLangs, 2) { showLanguageSheet = "native" }
-                LanguageRow("Learning (Max 3)", learningLangs, 3) { showLanguageSheet = "learning" }
-
-                SectionHeaderLabel("Interests")
-                InterestsGrid(hobbies) { showInterestSheet = true }
+            GroupedCard(title = "Basic Info") {
+                EditField(label = "Username", value = username, onValueChange = { username = it })
+                HorizontalDivider(color = FunkyBorderLight, modifier = Modifier.padding(vertical = 12.dp))
+                EditField(label = "Bio", value = bio, onValueChange = { bio = it }, singleLine = false)
             }
+
+            GroupedCard(title = "Languages") {
+                LanguageSelectionRow(
+                    label = "Native",
+                    languages = nativeLanguages,
+                    onAdd = { showLanguageSheet = "Native" }
+                )
+                HorizontalDivider(color = FunkyBorderLight, modifier = Modifier.padding(vertical = 12.dp))
+                LanguageSelectionRow(
+                    label = "Learning",
+                    languages = learningLanguages,
+                    onAdd = { showLanguageSheet = "Learning" }
+                )
+            }
+
+            GroupedCard(title = "Interests") {
+                InterestsFlow(interests) { showInterestSheet = true }
+            }
+
+            Spacer(Modifier.height(40.dp))
         }
 
         if (showInterestSheet) {
             InterestSelectionSheet(
-                selectedInterests = hobbies,
+                selectedInterests = interests,
                 onDismiss = { showInterestSheet = false },
-                onInterestsSelected = { hobbies = it }
+                onInterestsSelected = { interests = it }
             )
         }
 
         if (showLanguageSheet != null) {
             LanguageSelectionSheet(
                 type = showLanguageSheet!!,
-                selectedLanguages = if (showLanguageSheet == "native") nativeLangs else learningLangs,
+                selectedLanguages = if (showLanguageSheet == "Native") nativeLanguages else learningLanguages,
                 onDismiss = { showLanguageSheet = null },
-                onLanguageSelected = { selected ->
-                    if (showLanguageSheet == "native") {
-                        if (nativeLangs.size < 2) nativeLangs = nativeLangs + selected
+                onLanguageSelected = { lang ->
+                    if (showLanguageSheet == "Native") {
+                        if (!nativeLanguages.contains(lang)) nativeLanguages = nativeLanguages + lang
                     } else {
-                        if (learningLangs.size < 3) learningLangs = learningLangs + selected
+                        if (!learningLanguages.contains(lang)) learningLanguages = learningLanguages + lang
                     }
-                    showLanguageSheet = null
                 }
             )
         }
@@ -152,91 +147,70 @@ fun EditProfileScreen(navController: NavController, authViewModel: AuthViewModel
 }
 
 @Composable
-fun EditField(label: String, value: String, singleLine: Boolean = true, onValueChange: (String) -> Unit) {
+fun EditField(label: String, value: String, onValueChange: (String) -> Unit, singleLine: Boolean = true) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(label, style = AppTextStyle.labelSmall.copy(color = FunkyTextSecondary))
-        OutlinedTextField(
+        Text(label, style = AppTextStyle.labelSmall.copy(color = FunkyTextSecondary, fontSize = 11.sp))
+        BasicTextField(
             value = value,
             onValueChange = onValueChange,
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = FunkyYellow,
-                unfocusedBorderColor = FunkyBorder,
-                unfocusedContainerColor = FunkySurfaceElevated,
-                focusedContainerColor = FunkySurfaceElevated
-            ),
-            singleLine = singleLine,
-            textStyle = AppTextStyle.body.copy(fontSize = 14.sp)
+            textStyle = AppTextStyle.body.copy(color = FunkyTextPrimary, fontSize = 15.sp),
+            cursorBrush = SolidColor(FunkyYellow),
+            decorationBox = { innerTextField ->
+                Box {
+                    if (value.isEmpty()) {
+                        Text("Enter $label", style = AppTextStyle.body.copy(color = FunkyTextTertiary, fontSize = 15.sp))
+                    }
+                    innerTextField()
+                }
+            }
         )
     }
 }
 
 @Composable
-fun SectionHeaderLabel(title: String) {
-    Text(
-        title,
-        style = AppTextStyle.titleMedium.copy(fontSize = 16.sp, fontWeight = FontWeight.SemiBold),
-        modifier = Modifier.padding(top = 8.dp)
-    )
-}
-
-@Composable
-fun LanguageRow(label: String, languages: List<String>, max: Int, onAdd: () -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(label, style = AppTextStyle.labelSmall.copy(color = FunkyTextSecondary))
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            repeat(max) { index ->
-                val lang = languages.getOrNull(index)
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = if (lang != null) FunkyYellowSoft else FunkySurfaceElevated,
-                    border = if (lang != null) null else BorderStroke(1.dp, FunkyBorder),
-                    modifier = Modifier.height(40.dp).weight(1f).clickable(onClick = if (lang == null) onAdd else ({}))
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        if (lang != null) {
-                            Text(lang, style = AppTextStyle.label.copy(color = FunkyTextOnYellow, fontSize = 12.sp))
-                        } else {
-                            Icon(Icons.Default.Add, null, tint = FunkyTextTertiary, modifier = Modifier.size(18.dp))
-                        }
-                    }
-                }
+fun LanguageSelectionRow(label: String, languages: List<String>, onAdd: () -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(label, style = AppTextStyle.labelSmall.copy(color = FunkyTextSecondary, fontSize = 11.sp))
+            if (languages.isEmpty()) {
+                Text("None added", style = AppTextStyle.body.copy(color = FunkyTextTertiary, fontSize = 14.sp))
+            } else {
+                Text(languages.joinToString(", "), style = AppTextStyle.body.copy(color = FunkyTextPrimary, fontSize = 14.sp))
             }
+        }
+        IconButton(onClick = onAdd) {
+            Icon(Icons.Default.Add, null, tint = FunkyYellow)
         }
     }
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun InterestsGrid(interests: List<String>, onEdit: () -> Unit) {
-    Surface(
-        color = FunkySurfaceElevated,
-        shape = AppShapes.card,
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onEdit)
-    ) {
-        Box(Modifier.padding(14.dp)) {
-            if (interests.isEmpty()) {
-                Text("Select your interests", style = AppTextStyle.bodySmall.copy(color = FunkyTextTertiary))
-            } else {
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+fun InterestsFlow(interests: List<String>, onEdit: () -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            interests.forEach { interest ->
+                Surface(
+                    shape = RoundedCornerShape(100.dp),
+                    color = Color.White,
+                    border = BorderStroke(1.dp, FunkyBorderLight)
                 ) {
-                    interests.forEach { interest ->
-                        Surface(
-                            shape = RoundedCornerShape(100.dp),
-                            color = Color.White,
-                            border = BorderStroke(1.dp, FunkyBorder)
-                        ) {
-                            Text(
-                                interest,
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                                style = AppTextStyle.labelSmall.copy(color = FunkyTextPrimary, fontSize = 11.sp)
-                            )
-                        }
-                    }
+                    Text(
+                        interest,
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        style = AppTextStyle.labelSmall.copy(color = FunkyTextPrimary, fontSize = 12.sp)
+                    )
                 }
+            }
+            IconButton(
+                onClick = onEdit,
+                modifier = Modifier.size(32.dp).clip(CircleShape).background(FunkySurfaceElevated)
+            ) {
+                Icon(Icons.Default.Edit, null, modifier = Modifier.size(14.dp), tint = FunkyTextSecondary)
             }
         }
     }
@@ -251,50 +225,30 @@ fun InterestSelectionSheet(
 ) {
     val allInterests = listOf("Music", "Travel", "Coding", "Gaming", "Photography", "Art", "Movies", "Reading", "Sports", "Cooking", "Fashion", "Fitness")
     var currentSelected by remember { mutableStateOf(selectedInterests) }
-    var searchQuery by remember { mutableStateOf("") }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         containerColor = FunkySurface,
-        dragHandle = { BottomSheetDefaults.DragHandle(color = FunkyBorder) },
-        shape = AppShapes.bottomSheet
+        dragHandle = { BottomSheetDefaults.DragHandle(color = FunkyBorder) }
     ) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 32.dp)) {
             Text("Select Interests", style = AppTextStyle.headline.copy(fontSize = 18.sp), modifier = Modifier.padding(bottom = 12.dp))
 
-            OutlinedTextField(
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
-                placeholder = { Text("Search...", style = AppTextStyle.body.copy(color = FunkyTextTertiary)) },
-                modifier = Modifier.fillMaxWidth().height(50.dp),
-                shape = RoundedCornerShape(12.dp),
-                leadingIcon = { Icon(Icons.Default.Search, null, Modifier.size(18.dp)) },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = FunkyYellow,
-                    unfocusedBorderColor = FunkyBorder,
-                    unfocusedContainerColor = FunkySurfaceElevated,
-                    focusedContainerColor = FunkySurfaceElevated
-                )
-            )
-
-            Spacer(Modifier.height(16.dp))
-
-            LazyColumn(modifier = Modifier.heightIn(max = 300.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                val filtered = allInterests.filter { it.contains(searchQuery, ignoreCase = true) }
-                items(filtered) { interest ->
+            LazyColumn(modifier = Modifier.heightIn(max = 400.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(allInterests) { interest ->
                     val isSelected = currentSelected.contains(interest)
                     Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = if (isSelected) FunkyYellowSoft else Color.Transparent,
+                        shape = RoundedCornerShape(16.dp),
+                        color = if (isSelected) FunkyYellowSoft else FunkySurfaceElevated,
                         modifier = Modifier.fillMaxWidth().clickable {
                             currentSelected = if (isSelected) currentSelected - interest else currentSelected + interest
                         }
                     ) {
-                        Row(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Text(interest, style = AppTextStyle.label.copy(color = FunkyTextPrimary, fontSize = 14.sp))
+                        Row(Modifier.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Text(interest, style = AppTextStyle.label.copy(color = FunkyTextPrimary))
                             if (isSelected) {
                                 Spacer(Modifier.weight(1f))
-                                Icon(Icons.Default.Check, null, tint = FunkyYellow, modifier = Modifier.size(18.dp))
+                                Icon(Icons.Default.Check, null, tint = FunkyYellow, modifier = Modifier.size(20.dp))
                             }
                         }
                     }
@@ -304,11 +258,11 @@ fun InterestSelectionSheet(
             Spacer(Modifier.height(24.dp))
             Button(
                 onClick = { onInterestsSelected(currentSelected); onDismiss() },
-                modifier = Modifier.fillMaxWidth().height(50.dp),
-                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                shape = RoundedCornerShape(20.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = FunkyYellow, contentColor = FunkyTextOnYellow)
             ) {
-                Text("Confirm", style = AppTextStyle.label.copy(fontWeight = FontWeight.Bold))
+                Text("Confirm", style = AppTextStyle.label.copy(fontWeight = FontWeight.Bold, fontSize = 16.sp))
             }
         }
     }
@@ -323,50 +277,31 @@ fun LanguageSelectionSheet(
     onLanguageSelected: (String) -> Unit
 ) {
     val allLangs = listOf("English", "Spanish", "French", "German", "Chinese", "Japanese", "Korean", "Hindi")
-    var searchQuery by remember { mutableStateOf("") }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         containerColor = FunkySurface,
-        dragHandle = { BottomSheetDefaults.DragHandle(color = FunkyBorder) },
-        shape = AppShapes.bottomSheet
+        dragHandle = { BottomSheetDefaults.DragHandle(color = FunkyBorder) }
     ) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 32.dp)) {
             Text("Select $type Language", style = AppTextStyle.headline.copy(fontSize = 18.sp), modifier = Modifier.padding(bottom = 12.dp))
 
-            OutlinedTextField(
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
-                placeholder = { Text("Search...", style = AppTextStyle.body.copy(color = FunkyTextTertiary)) },
-                modifier = Modifier.fillMaxWidth().height(50.dp),
-                shape = RoundedCornerShape(12.dp),
-                leadingIcon = { Icon(Icons.Default.Search, null, Modifier.size(18.dp)) },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = FunkyYellow,
-                    unfocusedBorderColor = FunkyBorder,
-                    unfocusedContainerColor = FunkySurfaceElevated,
-                    focusedContainerColor = FunkySurfaceElevated
-                )
-            )
-
-            Spacer(Modifier.height(16.dp))
-
-            LazyColumn(modifier = Modifier.heightIn(max = 300.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                val filtered = allLangs.filter { it.contains(searchQuery, ignoreCase = true) }
-                items(filtered) { lang ->
+            LazyColumn(modifier = Modifier.heightIn(max = 400.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(allLangs) { lang ->
                     val isSelected = selectedLanguages.contains(lang)
                     Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = if (isSelected) FunkyYellowSoft else Color.Transparent,
+                        shape = RoundedCornerShape(16.dp),
+                        color = if (isSelected) FunkyYellowSoft else FunkySurfaceElevated,
                         modifier = Modifier.fillMaxWidth().clickable(enabled = !isSelected) {
                             onLanguageSelected(lang)
+                            onDismiss()
                         }
                     ) {
-                        Row(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Text(lang, style = AppTextStyle.label.copy(color = if (isSelected) FunkyTextTertiary else FunkyTextPrimary, fontSize = 14.sp))
+                        Row(Modifier.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Text(lang, style = AppTextStyle.label.copy(color = if (isSelected) FunkyTextTertiary else FunkyTextPrimary))
                             if (isSelected) {
                                 Spacer(Modifier.weight(1f))
-                                Text("Selected", style = AppTextStyle.caption.copy(color = FunkyTextTertiary))
+                                Text("Added", style = AppTextStyle.caption.copy(color = FunkyTextSecondary))
                             }
                         }
                     }

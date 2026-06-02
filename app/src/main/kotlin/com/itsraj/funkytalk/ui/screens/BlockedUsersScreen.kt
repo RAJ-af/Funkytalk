@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.itsraj.funkytalk.ui.components.*
 import com.itsraj.funkytalk.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -33,29 +34,35 @@ fun BlockedUsersScreen(onBack: () -> Unit) {
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("Blocked Users", style = AppTextStyle.titleLarge.copy(fontWeight = FontWeight.SemiBold)) },
+            TopAppBar(
+                title = { Text("Blocked Users", style = AppTextStyle.headline.copy(fontSize = 18.sp, fontWeight = FontWeight.Bold)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = FunkyTextPrimary)
                     }
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = FunkyBackground)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = FunkyBackground)
             )
         },
         containerColor = FunkyBackground
     ) { padding ->
-        Column(Modifier.fillMaxSize().padding(padding).padding(horizontal = 20.dp, vertical = 16.dp)) {
-            Surface(
-                color = FunkySurfaceElevated,
-                shape = AppShapes.card,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(0.dp)) {
-                    items(blockedUsers) { user ->
+        Column(Modifier.fillMaxSize().padding(padding).padding(24.dp)) {
+            Text(
+                "You won't see messages or profiles from people you've blocked.",
+                style = AppTextStyle.bodySmall.copy(color = FunkyTextSecondary),
+                modifier = Modifier.padding(bottom = 24.dp)
+            )
+
+            GroupedCard {
+                if (blockedUsers.isEmpty()) {
+                    Box(Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
+                        Text("No blocked users", style = AppTextStyle.body.copy(color = FunkyTextTertiary))
+                    }
+                } else {
+                    blockedUsers.forEachIndexed { index, user ->
                         BlockedUserRow(user)
-                        if (user != blockedUsers.last()) {
-                            HorizontalDivider(color = FunkyBorderLight, modifier = Modifier.padding(horizontal = 16.dp))
+                        if (index < blockedUsers.size - 1) {
+                            HorizontalDivider(color = FunkyBorderLight, modifier = Modifier.padding(vertical = 12.dp))
                         }
                     }
                 }
@@ -69,40 +76,28 @@ data class BlockedUser(val id: String, val name: String, val username: String, v
 @Composable
 fun BlockedUserRow(user: BlockedUser) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box {
-            AsyncImage(
-                model = user.avatarUrl ?: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200",
-                contentDescription = null,
-                modifier = Modifier.size(44.dp).clip(CircleShape),
-                contentScale = ContentScale.Crop
-            )
-            Text(
-                getFlagEmoji(user.countryCode),
-                modifier = Modifier.align(Alignment.BottomEnd).offset(x = 4.dp, y = 4.dp).size(16.dp).background(Color.White, CircleShape).padding(1.dp),
-                fontSize = 10.sp
-            )
-        }
+        AsyncImage(
+            model = user.avatarUrl ?: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200",
+            contentDescription = null,
+            modifier = Modifier.size(48.dp).clip(CircleShape),
+            contentScale = ContentScale.Crop
+        )
 
-        Spacer(Modifier.width(12.dp))
+        Spacer(Modifier.width(16.dp))
 
         Column(Modifier.weight(1f)) {
-            Text(user.name, style = AppTextStyle.label.copy(fontWeight = FontWeight.SemiBold, fontSize = 14.sp))
+            Text(user.name, style = AppTextStyle.label.copy(fontWeight = FontWeight.Bold, fontSize = 15.sp))
             Text("@${user.username}", style = AppTextStyle.caption.copy(color = FunkyTextSecondary))
         }
 
-        Button(
+        TextButton(
             onClick = { /* Unblock */ },
-            colors = ButtonDefaults.buttonColors(containerColor = FunkyBackground, contentColor = FunkyTextPrimary),
-            shape = RoundedCornerShape(10.dp),
-            contentPadding = PaddingValues(horizontal = 12.dp),
-            modifier = Modifier.height(30.dp),
-            elevation = ButtonDefaults.buttonElevation(0.dp),
-            border = BorderStroke(1.dp, FunkyBorder)
+            colors = ButtonDefaults.textButtonColors(contentColor = FunkyError)
         ) {
-            Text("Unblock", style = AppTextStyle.labelSmall.copy(fontSize = 11.sp))
+            Text("Unblock", style = AppTextStyle.label.copy(fontWeight = FontWeight.SemiBold))
         }
     }
 }
